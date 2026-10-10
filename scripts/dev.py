@@ -30,7 +30,7 @@ def stop(*_):
 signal.signal(signal.SIGTERM, stop)
 signal.signal(signal.SIGINT, stop)
 try:
-    processes.append(subprocess.Popen([args.uv, "run", "--directory", "apps/api", "--env-file", "../../.env", "uvicorn", "mealforge.main:app", "--host", "127.0.0.1", "--port", "8000", "--no-proxy-headers", "--reload"], cwd=root, env=environment, start_new_session=True))
+    processes.append(subprocess.Popen([args.uv, "run", "--directory", "apps/api", "--env-file", "../../.env", "uvicorn", "mealforge.main:app", "--host", "127.0.0.1", "--port", "8000", "--no-proxy-headers", "--no-access-log", "--reload"], cwd=root, env=environment, start_new_session=True))
     processes.append(subprocess.Popen([args.pnpm, "dev"], cwd=root, env=environment, start_new_session=True))
     while all(process.poll() is None for process in processes):
         time.sleep(1)

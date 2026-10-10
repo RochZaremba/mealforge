@@ -36,7 +36,7 @@ export default defineConfig({
     ? undefined
     : [
         {
-          command: 'uv run --project ../api uvicorn mealforge.main:app --host 127.0.0.1 --port 8000 --no-proxy-headers',
+          command: 'uv run --project ../api uvicorn mealforge.main:app --host 127.0.0.1 --port 8000 --no-proxy-headers --no-access-log',
           url: `${apiURL}/ready`,
           reuseExistingServer: !process.env.CI,
           timeout: 120_000,
