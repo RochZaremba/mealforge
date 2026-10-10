@@ -924,7 +924,7 @@ function AuthenticatedHousehold() {
           {household &&
             members.map((member) => (
               <MemberCard
-                key={`${member.id}-${reload}`}
+                key={`member-${member.id}-${reload}`}
                 member={member}
                 household={household}
                 session={session}
@@ -952,7 +952,7 @@ function AuthenticatedHousehold() {
             ))}
           {household && presets && household.capabilities.can_manage_access && (
             <InvitationManager
-              key={`${household.id}-${reload}`}
+              key={`invite-${household.id}-${reload}`}
               household={household}
               members={members}
               session={session}
@@ -986,7 +986,7 @@ function AuthenticatedHousehold() {
           )}
           {household && presets && (
             <SlotEditor
-              key={`${household.id}-${reload}`}
+              key={`slots-${household.id}-${reload}`}
               initial={presets}
               household={household}
               session={session}
