@@ -39,10 +39,13 @@ export default defineConfig({
           timeout: 120_000,
         },
         {
-          command: 'pnpm dev --hostname 127.0.0.1 --port 3000',
+          command: 'node ./e2e/start-production.mjs',
           url: webURL,
-          reuseExistingServer: !process.env.CI,
-          timeout: 120_000,
+          env: { NEXT_TELEMETRY_DISABLED: '1', API_BASE_URL: apiURL },
+          // A running dev server does not register the worker; explicitly opt out
+          // of management with PLAYWRIGHT_NO_SERVER for an existing production server.
+          reuseExistingServer: false,
+          timeout: 180_000,
         },
       ],
 });
