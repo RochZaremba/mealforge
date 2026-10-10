@@ -1,6 +1,6 @@
 # Konceptualny model danych i inwarianty
 
-Kontrakty poniżej opisują minimalny schemat logiczny. SQLAlchemy + Alembic ma być źródłem ostatecznego DDL, `contracts/openapi.yaml` jest zarysem interfejsu przed implementacją.
+Kontrakty poniżej opisują minimalny schemat logiczny, również dla przyszłych fal. SQLAlchemy + Alembic są źródłem wdrożonego DDL, `contracts/openapi.yaml` jest generowane z aktualnego API.
 
 ## Identity i żywienie
 
@@ -70,7 +70,15 @@ Kontrakty poniżej opisują minimalny schemat logiczny. SQLAlchemy + Alembic ma 
 
 `link_only` → (ręczne dane użytkownika) `draft_requires_review` → `normalized` → `nutrition_verified` → `validated`; błędy/licencje: `quarantined` / `rights_denied`.
 
-## W01-A schema implementation (pending integrated gate)
+## W01-A schema implementation (PR #2 merged; gates passed)
 Migration0002 adds users/password_hash (Argon2id), sessions/token_hash only with expiry/revocation, auth_rate_buckets with HMAC keys and finite windows; households with slot_revision; household_members with target_revision, composite id/household uniqueness and guest-no-login check; nutrition_profiles immutable version rows, composite household/member FK and Numeric(9,3) nullable targets; meal_slot_presets active rows with local time, nullable exact share, repeat_weekly; audit_events metadata only; idempotency_records actor/scope/key with fingerprint and private JSON result.
 
 Transactions lock the authenticated session for revocation consistency, member for target expected_version and household for slot revision. Idempotency uses a transaction-scoped PostgreSQL advisory lock; replay reauthorizes membership. Profile valid_from is a local date and cannot be future in A; history stays immutable. Guests/unlinked residents never authorize an account. Recipe/inventory/planning tables above remain requirements for future slices.
+
+## W01-B schema (implementation in progress; integrated gate pending)
+
+Migration0003 adds `household_members.access_enabled` (default true) and `access_version` (default 0), separately from participation `active` and nutrition `target_revision`. Account access changes do not delete or rewrite nutrition profiles. Authorization and household listing require the current active, access-enabled membership and matching authenticated user.
+
+`household_invitations` stores UUID, household, creator, editor/viewer role, optional existing member scoped with a composite household FK, private random nonce, unique SHA256 token hash, issued/expiry timestamps, accepted-at/by, revoked-at and version. Raw codes are derived with a domain-separated HMAC and never stored in idempotency JSON or audit metadata. The owner identity is protected by `households.owner_user_id`, not a mutable role string.
+
+Acceptance, access changes and private household operations serialize on the same household lock before invitation/member locks. Locked ORM reloads must refresh preloaded objects to avoid stale role or invitation status after concurrent revocation. Acceptance atomically links a resident, consumes the invitation, writes metadata-only audit and records idempotency. Session revocation and current authorization checks also apply on replay. Tests must prove single use across distinct accounts and preservation of the existing resident profile.

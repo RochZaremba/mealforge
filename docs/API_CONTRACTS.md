@@ -88,9 +88,27 @@ Odpowiedź 200 dopiero po transakcyjnym zatwierdzeniu; 409 `PLAN_VERSION_CONFLIC
 
 - 401 brak sesji, 403 brak uprawnień, 404 brak zasobu lub ukrywanie cudzych zasobów, 409 konflikt, 422 walidacja / brak danych, 424 niezależne API niedostępne bez wpływu na core, 429 limit, 503 niegotowość serwisu.
 
-## W01-A implemented contract (in progress; OpenAPI after integration)
+## W01-A implemented contract (PR #2 merged; tests and review passed)
 Auth register requires explicit subsequent login. GET /auth/session returns user, csrf_token and expires_at, never the raw session cookie. Trusted Origin and application/json for POST/PUT; authenticated mutations additionally X-CSRF-Token. Private responses no-store. Household mutations require Idempotency-Key (UUID), expected_version for target/slot updates; logout revokes and does not need an idempotency key.
 
 GET /households returns households; POST creates owner and five real presets atomically. GET /households/{id}/members returns members; POST adds a non-login resident or guest, not account access. PUT /households/{id}/members/{member_id}/nutrition-target appends history; GET .../nutrition-target/history reads it. GET/PUT /households/{id}/meal-slot-presets returns version and slots with id/name/ordering/default_time/default_share/repeat_weekly. Unknown targets null, true zero macro accepted, kcal known must be >0. Decimal strings up to6 integer and3 fraction digits, integer JSON accepted, fractional JSON float forbidden. Source user_set; immutable history. UI must distinguish target from consumed/calculated nutrition.
 
 Invitations and private recipe catalogue remain next slices, not implemented endpoints in A. No implicit sample goals on real signup. Household scope is always checked, including idempotency replay.
+
+## W01-B contract (implementation in progress; not yet verified)
+
+All routes below require a session; mutations require trusted Origin, JSON, X-CSRF-Token and a UUID Idempotency-Key. Responses are private `no-store`. Household authorization requires an active member with `access_enabled=true`; changing access does not change resident participation or nutrition history.
+
+| Method | Path | Input / result |
+|---|---|---|
+| POST | `/households/{id}/invite` | Owner only; `{role: "editor"\|"viewer", member_id: UUID\|null}`. Create a 24-hour invitation for an unlinked non-guest resident or a new resident. |
+| GET | `/households/{id}/invitations` | Owner only; `{invitations: [...]}` containing metadata, never codes, hashes or nonces. |
+| POST | `/households/{id}/invitations/{invitation_id}/revoke` | Owner only; `{expected_version}`. Versioned invalidation of a pending invitation. |
+| POST | `/household-invitations/accept` | `{token}` in JSON only; returns `{household, member}`. Atomically links the recipient account and consumes the invitation. |
+| PUT | `/households/{id}/members/{member_id}/access` | Owner only; `{expected_version, role: "editor"\|"viewer", access_enabled: boolean}`. Returns the updated member; canonical owner cannot be demoted or revoked. |
+
+Invitation metadata: `id`, `role`, nullable `member_id`, `expires_at`, `status` (`pending`, `accepted`, `revoked`, `expired`), `version` (starts at 1). Creation adds a 64-character lowercase hexadecimal `token`; other responses omit it. Member DTO adds `access_enabled` and `access_version` (starts at 0). These access versions are independent of target versions.
+
+Creation retries store only an invitation reference and regenerate the same code after current owner authorization. Secret rotation invalidates previous codes and regeneration. Acceptance retries reauthorize the current membership; a revoked account cannot regain access through replay. A consumed code with a new key is rejected. Code submission never appears in URLs, browser persistence or audit metadata. Invitation delivery is manual; the app sends no email.
+
+Linking an existing resident preserves member ID, targets, exact Decimal values, nulls, zeros and all profile history. Revoking account access preserves `active=true` and those same records. Guests cannot gain login access. Viewer reads are authorized but household writes are forbidden. Recipe catalogue remains W01-C.
