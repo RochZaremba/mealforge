@@ -15,6 +15,7 @@ export type Household = {
   timezone: string;
   currency: string;
   role: string;
+  capabilities: { can_edit: boolean; can_manage_access: boolean };
 };
 export type Target = {
   id: string;
@@ -36,6 +37,8 @@ export type Member = {
   user_id: string | null;
   nutrition_target: Target | null;
   version: number;
+  access_enabled: boolean;
+  access_version: number;
 };
 export type MealSlot = {
   id: string | null;

@@ -18,6 +18,11 @@ const routes: [RegExp, readonly string[]][] = [
     ["GET"],
   ],
   [new RegExp(`^households/${UUID}/meal-slot-presets$`), ["GET", "PUT"]],
+  [new RegExp(`^households/${UUID}/invite$`), ["POST"]],
+  [new RegExp(`^households/${UUID}/invitations$`), ["GET"]],
+  [new RegExp(`^households/${UUID}/invitations/${UUID}/revoke$`), ["POST"]],
+  [/^household-invitations\/accept$/, ["POST"]],
+  [new RegExp(`^households/${UUID}/members/${UUID}/access$`), ["PUT"]],
 ];
 const privateHeaders = { "Cache-Control": "no-store", Vary: "Cookie" };
 function problem(status: number, message: string, error_code: string) {
