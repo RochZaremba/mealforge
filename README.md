@@ -1,6 +1,6 @@
 # MealForge — zestaw startowy repozytorium dla Codexa
 
-> Stan: **WAVE-00 w integracji i testach**. API/DB/web baseline powstaje jako pierwszy etap. Planowanie, nutrition, households i kuchnia wymagają WAVE-01–07; aplikacja nie jest jeszcze gotowym produktem.
+> Stan: **WAVE-00 lokalnie zweryfikowana**. API/DB/web baseline powstaje jako pierwszy etap. Planowanie, nutrition, households i kuchnia wymagają WAVE-01–07; aplikacja nie jest jeszcze gotowym produktem.
 
 **Cel:** self-hosted PWA do planowania jedzenia dla dwóch osób (i gości), z osobnymi kaloriami i makro, wspólnym gotowaniem, meal prepem w słoikach/pojemnikach, magazynem, wydarzeniami i automatycznymi zakupami.
 

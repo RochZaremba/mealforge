@@ -1,6 +1,6 @@
 # Execution plan — 2026-10-10
 
-## WAVE-00: runnable baseline (IN PROGRESS)
+## WAVE-00: runnable baseline (local gates PASS; final PR CI pending)
 Cel: rzeczywiste FastAPI + PostgreSQL + Next.js, uruchamialne lokalnie i przez Docker Compose. Zakres nie obejmuje jeszcze prywatnych danych ani planowania.
 
 | Owner | Branch / worktree | Exclusive files |

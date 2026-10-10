@@ -2,22 +2,22 @@
 
 - **Owner(s):** architect + backend + frontend + qa
 - **Dependencies:** Brak (pierwsza fala)
-- **Status:** NOT STARTED (initial kit)
+- **Status:** LOCAL GATES PASS; PR #1 final CI/merge pending
 
 ## Implementation checklist
 
-- [ ] Create real monorepo: pnpm workspace for Next.js, uv/pyproject for FastAPI, domain package layout per ARCHITECTURE.
-- [ ] Implement /health and /ready, Next.js PWA shell and Polish nav; configure PostgreSQL/Alembic; developer Docker Compose with API/web + data stores.
-- [ ] Set migrations and demo fixture seeds, test framework pytest/Playwright, typecheck, eslint/ruff, GitHub CI with real commands.
-- [ ] Define Makefile dev/test/e2e/typecheck/lint/migrate/backup targets, not stubs.
-- [ ] Create docs/IMPLEMENTATION_STATUS.md, docs/TEST_REPORT.md, docs/EXECUTION_PLAN.md updates.
+- [x] Create real monorepo: pnpm workspace for Next.js, uv/pyproject for FastAPI, domain package layout per ARCHITECTURE.
+- [x] Implement /health and /ready, Next.js PWA shell and Polish nav; configure PostgreSQL/Alembic; developer Docker Compose with API/web + data stores.
+- [x] Set migrations and demo fixture seeds, test framework pytest/Playwright, typecheck, eslint/ruff, GitHub CI with real commands.
+- [x] Define Makefile dev/test/e2e/typecheck/lint/migrate/backup targets, not stubs.
+- [x] Create docs/IMPLEMENTATION_STATUS.md, docs/TEST_REPORT.md, docs/EXECUTION_PLAN.md updates.
 
 ## Acceptance gates
 
-- [ ] Fresh checkout (with secrets configured) starts backend+frontend+DB and health page via make dev.
-- [ ] Migration up/down/up works on disposable DB.
-- [ ] Auth must never leak raw secrets.
-- [ ] At least 1 API integration + 1 browser smoke test pass; no fake green.
+- [x] Fresh checkout (with secrets configured) starts backend+frontend+DB and health page via make dev.
+- [x] Migration up/down/up works on disposable DB.
+- [x] Auth must never leak raw secrets.
+- [x] At least 1 API integration + 1 browser smoke test pass; no fake green.
 
 ## Evidence and integration
 

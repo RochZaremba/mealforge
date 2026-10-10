@@ -20,13 +20,17 @@
 | PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/sbin/chromium make e2e | 0 | 10tests passed22.4s; desktop1440×900 and mobile390×844, realAPI readiness, network outage/retry,manifestPNG,SW public-cache/offline |
 | make seed backup-test | 0 | actual pg_dump→authenticated encryption→verify/decrypt→new disposableDB pg_restore; all5 reference rows match |
 | docker compose config --quiet | 0 | valid config, loopback bindings |
-| make dev (first attempt) | 2 | transient Corepack npm request failure; retry currently running; not marked green |
+| make dev (first attempt) | 2 | transient Corepack npm request failure |
+| make dev (second attempt) / compose run migrate | 2 | real Docker-only uv cache permission error for nonroot user; fixed migration command to installed Alembic executable; naprawa potwierdzona kolejnym make dev |
 | pnpm audit --prod --json (security reviewer) | 0 | 97 dependencies, known vulnerabilities0 |
 | pip-audit (security reviewer, initial) | 1 | pytest8.4.2 dev-only vulnerability; resolved by backend38bd7f to9.1.1 |
 | pip-audit (security reviewer, after fix) | 0 | no known vulnerabilities; local editable unpublished package excluded |
 | make test after pytest security fix | 0 | all16tests rerun passed1.74s, integrity1pass |
 
-One upstream Starlette/TestClient httpx deprecation warning, without failed tests. Actual local browser: system Chromium153.0.8010.52 on Arch, Playwright1.64.0; official CI bundle installation/Actions results not yet executed. Screenshots under docs/evidence/wave-00. Full product domain A01–A15 remain future-wave acceptance, not completed by shell smoke.
+| make dev (third attempt) | 0 | all3 services healthy; nonroot direct Alembic migration0; real HTTP health/ready/status/proxyready200 |
+| PLAYWRIGHT_NO_SERVER=1 make e2e (Docker + official bundle) | 0 |10tests passed6.4s, official Chrome156.0.8078.4 / Playwright1.64.0 against actual standalone Docker web and API |
+
+One upstream Starlette/TestClient httpx deprecation warning, without failed tests. Actual local browser: system Chromium153.0.8010.52 on Arch, Playwright1.64.0; official browser bundle also installed and tested against Docker; Actions for final Compose-fix head still pending. Screenshots under docs/evidence/wave-00. Independent reviewer approved local gate after their own Docker HTTP smoke. Full product domain A01–A15 remain future-wave acceptance, not completed by shell smoke.
 
 
 Audit nutrition/integrations: istniejące syntetyczne fixtures nie zawierają fikcyjnych wartości nutrient; fetch wszystkich źródeł wyłączony. Przed W01 kontrakt makro wymaga null; przed W02 import contract musi wymusić link-only/draft/provenance.
