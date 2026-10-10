@@ -14,7 +14,7 @@ async function confirmed(
   ));
   await action();
   const response = await pending;
-  expect(response.status(), await response.text()).toBe(status);
+  expect(response.status(), `${method} ${suffix}`).toBe(status);
   expect(response.headers()['cache-control']).toContain('no-store');
   return response;
 }
