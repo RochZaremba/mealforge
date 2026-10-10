@@ -2,7 +2,7 @@
 
 - **Owner(s):** backend + frontend + qa
 - **Dependencies:** WAVE-00
-- **Status:** NOT STARTED (initial kit)
+- **Status:** IN PROGRESS — slice A; invitations/original catalogue remain B/C
 
 ## Implementation checklist
 

@@ -30,7 +30,7 @@
 | make dev (third attempt) | 0 | all3 services healthy; nonroot direct Alembic migration0; real HTTP health/ready/status/proxyready200 |
 | PLAYWRIGHT_NO_SERVER=1 make e2e (Docker + official bundle) | 0 |10tests passed6.4s, official Chrome156.0.8078.4 / Playwright1.64.0 against actual standalone Docker web and API |
 
-One upstream Starlette/TestClient httpx deprecation warning, without failed tests. Actual local browser: system Chromium153.0.8010.52 on Arch, Playwright1.64.0; official browser bundle also installed and tested against Docker; Actions for final Compose-fix head still pending. Screenshots under docs/evidence/wave-00. Independent reviewer approved local gate after their own Docker HTTP smoke. Full product domain A01–A15 remain future-wave acceptance, not completed by shell smoke.
+One upstream Starlette/TestClient httpx deprecation warning, without failed tests. Actual local browser: system Chromium153.0.8010.52 on Arch, Playwright1.64.0; official browser bundle also installed and tested against Docker; Final CI subsequently passed (record below). Screenshots under docs/evidence/wave-00. Independent reviewer approved local gate after their own Docker HTTP smoke. Full product domain A01–A15 remain future-wave acceptance, not completed by shell smoke.
 
 
 Audit nutrition/integrations: istniejące syntetyczne fixtures nie zawierają fikcyjnych wartości nutrient; fetch wszystkich źródeł wyłączony. Przed W01 kontrakt makro wymaga null; przed W02 import contract musi wymusić link-only/draft/provenance.

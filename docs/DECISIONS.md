@@ -16,3 +16,5 @@ Przyjęte decyzje architektury; każdą istotną zmianę dokumentuj nowym ADR.
 - [0012 License boundaries](ADR/0012-data-licenses.md)
 
 - [0013 Baseline toolchain](ADR/0013-baseline-toolchain.md)
+
+- [0014 Private sessions and exact nullable targets](ADR/0014-private-sessions-and-targets.md)
