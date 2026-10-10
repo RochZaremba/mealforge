@@ -1,10 +1,10 @@
 # Status implementacji — aktualizuj po każdej fali
 
-**2026-10-10 (stan wyjściowy):** SPECIFICATION / CODEX AGENT KIT ONLY. **Nie ma jeszcze gotowej aplikacji.**
+**2026-10-10:** WAVE-00 lokalnie zweryfikowana; końcowe CI/merge PR #1 w toku. Repo zaczynało jako SPEC KIT; aplikacja nie jest jeszcze ukończona.
 
 | Wave | Status | Evidence |
 |---|---|---|
-| WAVE-00 | NOT STARTED | brak API/web, compose tylko dev dependencies |
+| WAVE-00 | VERIFIED (tests run; PR CI pending) | PR #1;16API/4PG,10E2E mobile+desktop,realCompose,backup restore; independent reviewer/security gate PASS; docs/TEST_REPORT.md |
 | WAVE-01 | NOT STARTED | brak funkcji profile/domowników |
 | WAVE-02 | NOT STARTED | brak importera/nutrition engine |
 | WAVE-03 | NOT STARTED | brak planera |

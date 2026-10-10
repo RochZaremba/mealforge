@@ -1,15 +1,77 @@
-name: kit-check
+name: mealforge-quality
 on:
   push:
   pull_request:
+permissions:
+  contents: read
 jobs:
-  validate-spec:
+  baseline:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: mealforge_ci
+          POSTGRES_USER: mealforge
+          POSTGRES_PASSWORD: ci_only_password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U mealforge -d mealforge_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg://mealforge:ci_only_password@127.0.0.1:5432/mealforge_ci
+      TEST_DATABASE_URL: postgresql+psycopg://mealforge:ci_only_password@127.0.0.1:5432/mealforge_test
+      APP_ENV: test
+      API_BASE_URL: http://127.0.0.1:8000
+      NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate bootstrap artifacts
-        run: python3 scripts/validate_kit.py
-# First implementation wave must add backend/frontend/test pipelines as genuine gates.
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.0'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '10.28.2'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: uv sync --directory apps/api --frozen
+      - run: pnpm install --frozen-lockfile
+      - run: uv run --directory apps/api python ../../scripts/validate_kit.py
+      - run: uv run --directory apps/api ruff check .
+      - run: uv run --directory apps/api mypy src
+      - run: uv run --directory apps/api pytest
+      - run: python3 scripts/test_backup_integrity.py
+      - run: uv run --directory apps/api bash ../../scripts/test_migrations.sh
+      - run: uv run --directory apps/api python -m mealforge.openapi --output ../../contracts/openapi.yaml --check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm build
+      - run: pnpm --filter @mealforge/web exec playwright install --with-deps chromium
+      - name: Start real services and check mobile/desktop
+        env:
+          PLAYWRIGHT_NO_SERVER: "1"
+        run: |
+          uv run --directory apps/api alembic upgrade head
+          apps/api/.venv/bin/uvicorn mealforge.main:app --host 127.0.0.1 --port 8000 --no-access-log > /tmp/mealforge-api.log 2>&1 &
+          api_process_id=$!
+          node apps/web/node_modules/next/dist/bin/next start apps/web --hostname 127.0.0.1 --port 3000 > /tmp/mealforge-web.log 2>&1 &
+          web_process_id=$!
+          trap 'kill "$api_process_id" "$web_process_id" 2>/dev/null || true; wait "$api_process_id" "$web_process_id" 2>/dev/null || true' EXIT
+          python3 scripts/wait_http.py http://127.0.0.1:8000/ready
+          python3 scripts/wait_http.py http://127.0.0.1:3000
+          pnpm e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-evidence
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+            /tmp/mealforge-api.log
+            /tmp/mealforge-web.log

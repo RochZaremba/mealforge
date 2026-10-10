@@ -1,45 +1,50 @@
-# Development i deployment instructions
+# Development — runnable WAVE-00 baseline
 
-## Status
+WAVE-00 implementuje rzeczywiste API/DB/web; funkcje żywieniowe w WAVE-01+ wymagają kolejnych fal. Nie używamy mock API do statusu. Wymagania: Docker+Compose, uv, pnpm10.28.2, Node22 LTS. uv automatycznie instaluje Python3.12. Sekrety lokalne tworzy make init-env bez ich wyświetlania.
 
-Starter to dokumentacja/konstrukcja dla Codexa. `compose.dev.yml` startuje **tylko** PostgreSQL + Redis. `apps/api` i `apps/web` mają powstać w WAVE-00/01.
-
-## Wymagania
-
-- Linux/macOS (Arch/Ubuntu OK), Git, Python 3.11+, Docker + Compose, Node.js LTS + pnpm, opcjonalnie uv, Codex CLI.
-- Jeśli Codex CLI nie jest dostępny, otwórz katalog w IDE z Codexem i wklej `PROMPT_START.txt`.
-
+## Docker (pełny baseline)
 ```bash
-cd mealforge
-python3 scripts/validate_kit.py
-cp .env.example .env
-# Zmień POSTGRES_PASSWORD, DATABASE_URL i SESSION_SECRET w .env.
-docker compose --env-file .env -f compose.dev.yml up -d
-codex "$(cat PROMPT_START.txt)"
+make init-env
+make dev
+# http://localhost:3000 oraz http://localhost:3000/status
+# http://localhost:8000/health oraz /ready
+make stop
 ```
+Compose buduje API i web, migracja kończy się przed API, DB jest prywatny poza portem loopback w development. make stop zachowuje dane. Nie uruchamiaj jednocześnie serwerów local i Docker na tych samych portach. Domyślny POSTGRES_PORT=5432; ustaw wolny port oraz zgodny DATABASE_URL w prywatnym .env w razie konfliktu. Ta sesja używa55432.
 
-### Po ukończeniu WAVE-00 (do zaimplementowania przez agentów)
-
-Oczekiwane komendy / standard:
-
+## Lokalne serwery
 ```bash
-make dev          # Next + FastAPI + PostgreSQL/Redis dev deps
-make test         # unit, integration
-make lint         # ruff/eslint
-make typecheck    # mypy/tsc
-make e2e          # Playwright
-make migrate      # Alembic upgrade head
-make backup       # pg_dump backup
+make init-env
+make deps
+make install
+make migrate
+make dev-local
 ```
+Next dev oraz API na loopback; Ctrl+C zatrzymuje obydwa procesy. Nieoczekiwane zakończenie serwera daje błąd. Pełne testy PWA wymagają production build; make e2e uruchamia własny production server.
 
-Powyższe make targets NIE istnieją w zestawie i **są wymaganiami do wykonania przez agentów**, nie działającymi obecnie poleceniami. Nie zgłaszaj ich jako green.
+## Quality gates
+```bash
+make validate-kit
+make test
+make migration-test
+make check-contract
+make lint
+make typecheck
+make build
+pnpm --filter @mealforge/web exec playwright install chromium
+make e2e
+```
+make test używa izolowanych UUID baz PostgreSQL; potrzebne CREATE DATABASE. Brak konfiguracji DB powoduje jawne pominięcie integration przez pytest; takie pominięcie nie jest green wave gate. Migration test nie zmienia skonfigurowanej bazy — używa i usuwa wyłącznie nową bazę testową. OpenAPI eksport: make openapi; drift: make check-contract. contracts/openapi.yaml zawiera JSON (legalny YAML), generowany wyłącznie z FastAPI. Zarys przyszłych endpointów pozostaje w API_CONTRACTS.
 
-## Self-hosting release criteria
+Jeśli masz już uruchomiony production web/API, użyj PLAYWRIGHT_NO_SERVER=1 make e2e. make e2e normalnie wymaga wolnego portu3000; nie podmienia serwera developerskiego. API musi być po migracji; .env jest wczytywany przez uv.
 
-- Oddzielny `.env.production`, silne sekrety, backup szyfrowany, TLS, secrets management, izolowana sieć postgres/redis, brak publicznych portów DB.
-- Test restore na kopii, HTTP health + readiness, Log rotation, CORS whitelist, CSRF, downtime-friendly migrations.
-- Uprawnienia only needed, nonroot containers, pinned images; wybór domeny przez użytkownika.
+## Backup development
+Przygotuj prywatny plik hasła (chmod600), ustaw BACKUP_PASSPHRASE_FILE na jego absolutną ścieżkę. Nie umieszczaj hasła w CLI/historii/repo.
+```bash
+make backup
+python3 scripts/decrypt_backup.py backups/<plik>.dump.enc /tmp/mealforge-restore.dump
+```
+Backup pg_dump custom-format jest szyfrowany AES256/PBKDF2 i uwierzytelniony HMAC; weryfikacja następuje przed odszyfrowaniem. Skrypt nie nadpisuje istniejącego output. pg_restore testuj wyłącznie na nowej, disposable bazie. Backupy ignorowane przez Git; eksport odszyfrowany jest prywatny i wymaga usunięcia po teście.
 
-## Import src
-
-Zdalny import `RECIPE_REMOTE_IMPORT_ENABLED=false` domyślnie. Włączenie tylko po source review i certyfikacji domeny w registry, nie globalny przełącznik do scrapowania.
+## Release
+Brak automatycznego produkcyjnego deployu. TLS, klucze/secrets custody, harmonogram backupów, poza-hostowy storage, pełne restore drill oraz wszystkie P0 nadal wymagają release checklist. RECIPE_REMOTE_IMPORT_ENABLED=false; rejestr config/recipe_sources.json blokuje automatyczne fetch bez praw.

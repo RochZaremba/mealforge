@@ -22,3 +22,6 @@ test-results/
 *.bak
 *.pem
 *.key
+
+backups/
+*.tsbuildinfo

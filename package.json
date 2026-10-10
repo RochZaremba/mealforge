@@ -1,0 +1,12 @@
+{
+  "name": "mealforge",
+  "private": true,
+  "packageManager": "pnpm@10.28.2",
+  "scripts": {
+    "dev": "pnpm --filter @mealforge/web dev",
+    "build": "pnpm --filter @mealforge/web build",
+    "lint": "pnpm --filter @mealforge/web lint",
+    "typecheck": "pnpm --filter @mealforge/web typecheck",
+    "e2e": "pnpm --filter @mealforge/web exec playwright test"
+  }
+}
