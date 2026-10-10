@@ -60,7 +60,7 @@ jobs:
           uv run --directory apps/api alembic upgrade head
           apps/api/.venv/bin/uvicorn mealforge.main:app --host 127.0.0.1 --port 8000 --no-access-log > /tmp/mealforge-api.log 2>&1 &
           api_process_id=$!
-          node apps/web/node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3000 > /tmp/mealforge-web.log 2>&1 &
+          node apps/web/node_modules/next/dist/bin/next start apps/web --hostname 127.0.0.1 --port 3000 > /tmp/mealforge-web.log 2>&1 &
           web_process_id=$!
           trap 'kill "$api_process_id" "$web_process_id" 2>/dev/null || true; wait "$api_process_id" "$web_process_id" 2>/dev/null || true' EXIT
           python3 scripts/wait_http.py http://127.0.0.1:8000/ready
@@ -73,3 +73,5 @@ jobs:
           path: |
             apps/web/playwright-report/
             apps/web/test-results/
+            /tmp/mealforge-api.log
+            /tmp/mealforge-web.log

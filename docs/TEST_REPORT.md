@@ -37,3 +37,5 @@ Audit nutrition/integrations: istniejące syntetyczne fixtures nie zawierają fi
 
 ## CI feedback loop
 Actions38063054961 (f2bbfe6): all validation/test/build/E2E steps successful, overall failure at setup-uv post-cleanup. uv run hosting long-lived API held cache lock; uv cache prune waited300s then failed. Fix: direct installed uvicorn for CI service, direct Next CLI, EXIT trap kills/waits both servers, job budget15minutes. New head CI required before merge; no checks skipped.
+
+Actions38066342121 (9ff35f1): direct API healthy, web failed HTTP readiness because Next CLI ran in monorepo root without app directory. Independently reproduced locally (exit1, missing root .next) and reviewer identified same. Fixed explicit start apps/web directory; local corrected startup on3002 and /status200 confirmed. Server logs attached to CI artifacts for failures. Next exact-head CI still required.
