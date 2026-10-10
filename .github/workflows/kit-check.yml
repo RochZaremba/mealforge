@@ -62,7 +62,7 @@ jobs:
           PLAYWRIGHT_NO_SERVER: "1"
         run: |
           uv run --directory apps/api alembic upgrade head
-          apps/api/.venv/bin/uvicorn mealforge.main:app --host 127.0.0.1 --port 8000 --no-access-log > /tmp/mealforge-api.log 2>&1 &
+          apps/api/.venv/bin/uvicorn mealforge.main:app --host 127.0.0.1 --port 8000 --no-access-log --no-proxy-headers > /tmp/mealforge-api.log 2>&1 &
           api_process_id=$!
           node apps/web/node_modules/next/dist/bin/next start apps/web --hostname 127.0.0.1 --port 3000 > /tmp/mealforge-web.log 2>&1 &
           web_process_id=$!
