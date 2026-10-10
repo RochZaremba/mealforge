@@ -45,9 +45,9 @@ function LinkForm({ session, household, onSaved, onCancel }: { session: Session;
     if (!household.capabilities.can_edit || busy) return;
     const generation = currentAuthGeneration();
     setError("");
-    const body = { user_title: title.trim(), source_url: url, own_note: note.trim() || null, own_contribution_attestation: "i_am_author_of_label_and_note" };
+    const body = { user_title: title.trim(), source_url: url.trim(), own_note: note.trim() || null, own_contribution_attestation: "i_am_author_of_label_and_note" };
     if (!attested || !body.user_title) { setError("Dodaj własny tytuł i potwierdź autorstwo tytułu oraz notatki."); return; }
-    if (new TextEncoder().encode(url).byteLength > 2048) { setError("Adres jest zbyt długi. Możesz zapisać do 2048 bajtów adresu."); return; }
+    if (new TextEncoder().encode(body.source_url).byteLength > 2048) { setError("Adres jest zbyt długi. Możesz zapisać do 2048 bajtów adresu."); return; }
     if (new TextEncoder().encode(JSON.stringify(body)).byteLength > 16384) { setError("Dane są zbyt długie do jednego zapisu. Skróć własny tekst i spróbuj ponownie."); return; }
     setBusy(true);
     try {
