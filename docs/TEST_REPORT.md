@@ -98,3 +98,5 @@ Final exact-head4eaf30c CI PASS: Actions38075073982+38075070579, including Postg
 - Root `PLAYWRIGHT_NO_SERVER=1 make e2e`: exit0,16passed17.2s official bundled Chrome, actual Docker; includes all14A/W00regressions and2B two-account lifecycle cases.
 - After actual B browser writes, `make backup-test`: exit0,12tables554rows exact; snapshot includes2actual invitation records plus42profiles/112audit/110idempotency rows. Counts only; no private values printed.
 - Final local source review: docs/reviews/WAVE-01-B.md. Exact final-head CI remains merge gate; priorbf0 CI did not include new B browser cases.
+
+W01-B final exact-headd650dd006ea62701ff2ef1bd4cd0b6442401c365 CI PASS: Actions38082688574+38082684928, including83API/16E2E and cleanup. Final root `make lint typecheck build`: exit0,27API sourcefiles/11web routes. PR3 merged7b1df55703acbff3a86c3a94ad725d85a0950678 at2026-10-10T20:13:46Z. W01-C starts only after this gate; no C tests or feature success yet.

@@ -20,3 +20,5 @@ Przyjęte decyzje architektury; każdą istotną zmianę dokumentuj nowym ADR.
 - [0014 Private sessions and exact nullable targets](ADR/0014-private-sessions-and-targets.md)
 
 - [0015 Invitations and access revocation](ADR/0015-invitations-and-access-revocation.md)
+
+- [0016 Private recipe snapshots and explicit demo](ADR/0016-private-recipe-snapshots-and-demo.md)

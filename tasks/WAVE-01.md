@@ -2,11 +2,11 @@
 
 - **Owner(s):** backend + frontend + qa
 - **Dependencies:** WAVE-00
-- **Status:** IN PROGRESS — A merged (PR #2); invitations B local gates passed (PR #3 final CI/merge gate), original catalogue C remains
+- **Status:** IN PROGRESS — A merged (PR #2); B merged (PR #3); original catalogue/demo C in implementation
 
 ## Implementation checklist
 
-- [x] Build password/session authentication, household membership and guest profile (no login for guest); A merged, B local83API/16E2E gate passed.
+- [x] Build password/session authentication, household membership and guest profile (no login for guest); A/B merged;83API/16E2E gate passed.
 - [ ] Implement 2 sample members only as seeded demo data (2700 and 1600 kcal), all targets editable (kcal B W T), history versions.
 - [x] Create 5 editable daily slot presets, repeat breakfast/dinner controls, Polish onboarding, mobile/desktop dashboard (A, real PostgreSQL and 390/1440 E2E).
 - [ ] Create first ORIGINAL recipe fixtures/seed with real amounts and user-editable instructions; incomplete nutrient data visible as unknown.
