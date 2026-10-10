@@ -13,3 +13,5 @@ PR: https://github.com/RochZaremba/mealforge/pull/1. Source code reviewed across
 Resolved: P1 CI duplicate server start; P1 dev SW disabled in e2e; P1 Docker migration uv cache denied under nonroot user (direct installed Alembic now0); P2 web readiness healthcheck absent; P2 local dev LAN bind; P2 dev pytest vulnerability. Root also fixed dev launcher false success and backup authenticated integrity.
 
 Auth, household isolation, macro arithmetic, inventory concurrency, SSRF adapter, unsafe-canning constraints and saved-plan offline queue remain future wave gates, not passed by baseline tests. No production deploy. CI/merge status recorded in implementation status and test report when complete.
+
+CI follow-up: actual post-job uv cache-lock failure led to direct uvicorn/Next process startup and explicit EXIT cleanup, preserving cache and all test gates; latest-head CI still required.
