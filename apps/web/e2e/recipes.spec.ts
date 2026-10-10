@@ -299,9 +299,9 @@ test('a committed response from the prior household cannot add its member to the
     await page.getByLabel('Imię domownika', { exact: true }).fill('Domownik wyłącznie A');
     await page.getByRole('button', { name: 'Dodaj domownika', exact: true }).click();
     expect(await committedResponse).toBe(201);
-    await confirmed(page, 'GET', `/${second.id}/members`, () => page.getByRole('combobox', {
-      name: 'Gospodarstwo', exact: true,
-    }).selectOption(second.id), 200);
+    await confirmed(page, 'GET', `/${second.id}/members`, async () => {
+      await page.getByRole('combobox', { name: 'Gospodarstwo', exact: true }).selectOption(second.id);
+    }, 200);
     const delivered = page.waitForResponse((response) => response.request().method() === 'POST'
       && new URL(response.url()).pathname.endsWith(`/${first.id}/members`), { timeout: 10_000 });
     release();
