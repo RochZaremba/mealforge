@@ -1,0 +1,71 @@
+# Konceptualny model danych i inwarianty
+
+Kontrakty poniżej opisują minimalny schemat logiczny. SQLAlchemy + Alembic ma być źródłem ostatecznego DDL, `contracts/openapi.yaml` jest zarysem interfejsu przed implementacją.
+
+## Identity i żywienie
+
+- `users(id, email unique, display_name, created_at)`
+- `households(id, name, owner_id, timezone, currency, created_at)`
+- `household_members(id, household_id, user_id?, display_name, role, is_guest, active)`; `role` owner/editor/viewer; guest może być profilem bez loginu.
+- `nutrition_profiles(id, member_id, kcal_target, protein_target_g, carb_target_g, fat_target_g, activity, goal_type, valid_from, valid_to)`; profile versioned.
+- `member_restrictions(id, member_id, ingredient_id?, allergen_code?, restriction_type, severity, note)`.
+- `meal_slot_presets(id, household_id, slot_name, ordering, default_share, default_time)`; standardowych 5, włączanie per member/day.
+
+## Recipes / provenance / nutrition
+
+- `ingredients(id, canonical_name, food_group, default_unit, allergens, raw_cooked_state)`.
+- `ingredient_synonyms(id, ingredient_id, language, alias)`.
+- `food_nutrient_records(id, ingredient_id, source_system, source_id, raw_cooked_state, basis_g, calories_kcal?, protein_g?, fat_g?, carbs_g?, fiber_g?, saturated_fat_g?, sodium_mg?, quality, retrieved_at, license)`.
+- `recipes(id, household_id?, title, visibility, validation_status, primary_source_id?, created_by_member_id?)`.
+- `recipe_versions(id, recipe_id, version, yield_g?, servings?, prep_time_min?, cook_time_min?, instructions_rights?, frozen_nutrition_json?, validated_at?)`.
+- `recipe_ingredients(id, recipe_version_id, ingredient_id?, literal_name, amount?, unit, normalized_g?, weight_state, match_confidence, parse_status)`.
+- `recipe_sources(id, recipe_id?, source_domain, canonical_url, author?, license_name?, attribution?, rights_mode, fetch_permission_ref?, fetched_at?, fingerprint?, source_status)`.
+- `recipe_ratings(id, household_member_id, recipe_id, rating, feedback, created_at)`.
+
+## Plans / events
+
+- `meal_plans(id, household_id, start_date, end_date, status, version, objective_snapshot_json)`.
+- `meal_slots(id, plan_id, day, slot_preset_id, excluded, locked, repeat_template_key?, event_id?)`.
+- `planned_meals(id, meal_slot_id, recipe_version_id?, planned_batch_id?, external_meal, prep_session_id?, version)`.
+- `planned_portions(id, planned_meal_id, member_id, portion_mass_g?, extras_json, nutrient_snapshot_json, portion_status)`.
+- `calendar_events(id, household_id, start_time, end_time, event_type, participant_scope, meal_scope, guest_count, notes, version)`.
+- `plan_changes(id, plan_id, base_version, new_version, actor_member_id, op_type, before_json, after_json, timestamp)`.
+
+## Batching / storage / inventory
+
+- `containers(id, household_id, label, volume_ml?, tare_g?, freezer_safe, dishwasher_safe)`.
+- `cooking_sessions(id, household_id, scheduled_at, actual_started_at?, status, equipment_json)`.
+- `meal_batches(id, household_id, recipe_version_id, session_id, made_at?, yield_g?, nutrition_snapshot_json, storage_method, storage_validation_ref?, status)`.
+- `batch_portions(id, batch_id, net_weight_g, container_id?, storage_location_id?, reserved_for_planned_portion_id?, best_before?, status, label_code unique)`.
+- `inventory_locations(id, household_id, location_kind, name)`.
+- `inventory_lots(id, household_id, ingredient_id?, product_barcode?, batch_portion_id?, location_id, unit, received_at, opened_at?, expires_at?, current_quantity, reserved_quantity, row_version)`.
+- `inventory_transactions(id, household_id, lot_id, actor_id, operation, quantity_delta, reservation_delta, idempotency_key, related_entity_type?, related_entity_id?, created_at)`.
+- `inventory_reservations(id, lot_id, plan_version_id?, batch_id?, quantity, status, version)`.
+
+## Shopping / feedback
+
+- `shopping_lists(id, household_id, for_plan_id, plan_version, status, updated_at)`.
+- `shopping_items(id, list_id, ingredient_id, amount_g, units, pack_size?, price_estimate?, price_source?, checked_by?, received_lot_id?)`.
+- `food_prices(id, source, product_ref, price, currency, pack_quantity, observed_at)`.
+- `preference_feedback(id, member_id, recipe_id, kind, rating?, reason_code?, created_at)`.
+- `audit_events(id, household_id, actor_id, action, entity_type, entity_id, version_before?, version_after?, request_id, created_at)`.
+
+## Inwarianty blokujące release
+
+- W każdej tabeli `household_id` jest egzekwowany przez service layer; obcy ID w URL nie upoważnia do odczytu/mutacji.
+- `InventoryLot.available = current_quantity - reserved_quantity >= 0` i nigdy `current_quantity < 0` (dla niezarejestrowanego odpadu oddzielna operacja).
+- `BatchPortion` wskazana jako consumed nie może nadal pozostawać reserved dla innego planu.
+- Atomic commit: zmiana planu + różnice rezerwacji + shopping snapshot tworzą jeden spójny version id; w razie błędu rollback.
+- Cena/gramy oraz skwantowane makro liczone jako Decimal lub int scaled units; brak wartości jest `null`, nie zero.
+- `RecipeVersion` immutable po `validated_at`, wersjonowanie zmian receptury zamiast nadpisywania historycznych wyników.
+- Gdy `recipe_sources.rights_mode=link_only`, dozwolone jest jedynie przechowywanie URL i użytkownikowskich pól pomocniczych; żadnych skopiowanych instrukcji/zdjęć w publicznym katalogu.
+- `verified_canned_food` wymaga `storage_validation_ref` do zatwierdzonego przepisu i procesu; nie odziedziczy go custom recipe automatycznie.
+- Wszystkie mutacje inventory mają unikalne `(household_id, idempotency_key)`; duplikat nie może zmienić stanów po raz drugi.
+
+## Stany planów
+
+`draft -> validated -> committed -> archived`. Jedynie committed plan rezerwuje zapasy. Przepis z linku = metadata/favorite, ale nie automated recipe candidate bez danych.
+
+## Stany importu
+
+`link_only` → (ręczne dane użytkownika) `draft_requires_review` → `normalized` → `nutrition_verified` → `validated`; błędy/licencje: `quarantined` / `rights_denied`.

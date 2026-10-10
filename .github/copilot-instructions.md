@@ -1,0 +1,1 @@
+Follow the root `AGENTS.md`, `MASTER_PROMPT.md`, and `docs/ROADMAP.md`. Do not use external copyrighted recipe text/images without permission; restricted recipe sites are link-only by default. Keep nutrition inputs traceable and inventory mutations transactional. Implement real, tested slices and update `docs/IMPLEMENTATION_STATUS.md`.

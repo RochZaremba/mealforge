@@ -1,0 +1,29 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Recipe",
+  "name": "Testowa zupa z ciecierzycą i pomidorami (syntetyczna)",
+  "author": {
+    "@type": "Person",
+    "name": "MealForge demo"
+  },
+  "recipeYield": "4 porcje",
+  "totalTime": "PT40M",
+  "recipeIngredient": [
+    "400 g ciecierzycy gotowanej",
+    "500 g passaty pomidorowej",
+    "200 g marchewki",
+    "150 g cebuli",
+    "10 g oliwy"
+  ],
+  "recipeInstructions": [
+    {
+      "@type": "HowToStep",
+      "text": "Pokrój warzywa."
+    },
+    {
+      "@type": "HowToStep",
+      "text": "Podgrzej składniki w garnku do miękkości."
+    }
+  ],
+  "description": "Własny przykładowy JSON-LD do testów parsera. Nie jest to przepis źródłowy z cudzego serwisu."
+}

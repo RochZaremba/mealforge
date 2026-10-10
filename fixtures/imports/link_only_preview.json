@@ -1,0 +1,28 @@
+{
+  "source_mode": "link_only",
+  "source_url": "https://aniagotuje.pl/przepis/example",
+  "title": "Mój zapisany link (nazwa użytkownika)",
+  "provenance": {
+    "source_id": "aniagotuje",
+    "rights_mode": "link_only",
+    "license": "all_rights_reserved",
+    "author": null,
+    "attribution": null,
+    "checked_at": "2026-10-10T12:00:00+02:00",
+    "rights_approval_id": null
+  },
+  "yield_mass_g": null,
+  "servings": null,
+  "ingredients": [],
+  "instructions": [],
+  "nutrients": {
+    "kcal": null,
+    "protein_g": null,
+    "carbs_g": null,
+    "fat_g": null
+  },
+  "validation_status": "link_only",
+  "warnings": [
+    "Pełnych danych nie pobieramy automatycznie z tego źródła."
+  ]
+}

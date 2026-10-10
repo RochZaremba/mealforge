@@ -1,0 +1,15 @@
+name: kit-check
+on:
+  push:
+  pull_request:
+jobs:
+  validate-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate bootstrap artifacts
+        run: python3 scripts/validate_kit.py
+# First implementation wave must add backend/frontend/test pipelines as genuine gates.

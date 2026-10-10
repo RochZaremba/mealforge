@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mealforge.local/contracts/recipe-import.schema.json",
+  "title": "Recipe import normalization and rights record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "source_mode",
+    "source_url",
+    "title",
+    "provenance",
+    "ingredients",
+    "validation_status"
+  ],
+  "properties": {
+    "source_mode": {
+      "enum": [
+        "link_only",
+        "user_authored",
+        "user_supplied_jsonld",
+        "authorized_api",
+        "authorized_fetch"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "canonical_url": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "rights_mode",
+        "license",
+        "checked_at"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string"
+        },
+        "rights_mode": {
+          "enum": [
+            "link_only",
+            "private_user_content",
+            "attributable_licensed",
+            "approved_api"
+          ]
+        },
+        "license": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "author": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attribution": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "rights_approval_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "yield_mass_g": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "servings": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "ingredients": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "raw_name",
+          "grams",
+          "status"
+        ],
+        "properties": {
+          "raw_name": {
+            "type": "string"
+          },
+          "ingredient_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "raw_amount": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "grams": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "raw_or_cooked": {
+            "enum": [
+              "raw",
+              "cooked",
+              "unknown"
+            ]
+          },
+          "status": {
+            "enum": [
+              "verified",
+              "estimated",
+              "unknown"
+            ]
+          }
+        }
+      }
+    },
+    "instructions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "nutrients": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kcal": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "protein_g": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "carbs_g": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "fat_g": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "fiber_g": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "validation_status": {
+      "enum": [
+        "link_only",
+        "draft_requires_review",
+        "normalized",
+        "nutrition_verified",
+        "validated",
+        "quarantined",
+        "rights_denied"
+      ]
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

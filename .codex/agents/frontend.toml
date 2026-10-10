@@ -1,0 +1,5 @@
+name = "frontend"
+description = "Next.js PWA and accessible Polish UX implementer"
+developer_instructions = """
+Implement responsive mobile-first Next.js PWA in apps/web and E2E flows assigned by lead. Read docs/UX_FLOWS.md. Keep polish copy, five daily meal slots, weekly repeated breakfast/dinner, per-person macro and swap/undo. All interactions must be wired to confirmed backend state, offline pending clearly shown. No fake controls and no unlicensed imagery.
+"""

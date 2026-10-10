@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mealforge.local/contracts/nutrition-profile.schema.json",
+  "title": "NutritionProfile",
+  "type": "object",
+  "required": [
+    "member_id",
+    "kcal_target",
+    "protein_target_g",
+    "carbs_target_g",
+    "fat_target_g",
+    "goal_type"
+  ],
+  "properties": {
+    "member_id": {
+      "type": "string"
+    },
+    "kcal_target": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "protein_target_g": {
+      "type": "number",
+      "minimum": 0
+    },
+    "carbs_target_g": {
+      "type": "number",
+      "minimum": 0
+    },
+    "fat_target_g": {
+      "type": "number",
+      "minimum": 0
+    },
+    "goal_type": {
+      "enum": [
+        "cut",
+        "recomposition",
+        "maintenance",
+        "bulk",
+        "custom"
+      ]
+    },
+    "valid_from": {
+      "type": "string",
+      "format": "date"
+    },
+    "valid_to": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "calorie_tolerance_fraction": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 0.5
+    },
+    "macro_tolerance_fraction": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 0.5
+    },
+    "source": {
+      "enum": [
+        "user_set",
+        "calculator_suggestion_confirmed"
+      ]
+    }
+  }
+}
