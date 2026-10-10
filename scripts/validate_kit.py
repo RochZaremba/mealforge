@@ -7,6 +7,7 @@ when available, and skipped explicitly otherwise.
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 import tomllib
@@ -65,7 +66,12 @@ for role in roles:
     except Exception as exc:
         errors.append(f'Invalid role {role.name}: {exc}')
 
-json_files=sorted(ROOT.rglob('*.json'))
+excluded_dirs = {'.git', '.venv', 'node_modules', '.next', '.pytest_cache', '.mypy_cache', '.ruff_cache', 'dist', 'build', 'coverage', 'playwright-report', 'test-results'}
+json_files = []
+for directory, subdirs, files in os.walk(ROOT):
+    subdirs[:] = [name for name in subdirs if name not in excluded_dirs]
+    json_files.extend(Path(directory) / name for name in files if name.endswith('.json'))
+json_files.sort()
 parsed={}
 for path in json_files:
     try:

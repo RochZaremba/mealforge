@@ -14,3 +14,5 @@ Przyjęte decyzje architektury; każdą istotną zmianę dokumentuj nowym ADR.
 - [0010 Offline and versioning](ADR/0010-offline-undo.md)
 - [0011 Controlled feedback loop](ADR/0011-feedback-loop.md)
 - [0012 License boundaries](ADR/0012-data-licenses.md)
+
+- [0013 Baseline toolchain](ADR/0013-baseline-toolchain.md)

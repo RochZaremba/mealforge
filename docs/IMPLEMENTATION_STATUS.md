@@ -1,10 +1,10 @@
 # Status implementacji — aktualizuj po każdej fali
 
-**2026-10-10 (stan wyjściowy):** SPECIFICATION / CODEX AGENT KIT ONLY. **Nie ma jeszcze gotowej aplikacji.**
+**2026-10-10:** WAVE-00 w implementacji. Repo zaczynało jako SPEC KIT; aplikacja nie jest jeszcze ukończona.
 
 | Wave | Status | Evidence |
 |---|---|---|
-| WAVE-00 | NOT STARTED | brak API/web, compose tylko dev dependencies |
+| WAVE-00 | IN PROGRESS | lead/backend/frontend/qa osobne branche; rzeczywisty PostgreSQL działa; testy aplikacji oczekują integracji |
 | WAVE-01 | NOT STARTED | brak funkcji profile/domowników |
 | WAVE-02 | NOT STARTED | brak importera/nutrition engine |
 | WAVE-03 | NOT STARTED | brak planera |

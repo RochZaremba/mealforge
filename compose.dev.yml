@@ -1,30 +1,51 @@
-# Infrastructure dependencies only. API/web services are created in WAVE-00/01.
+name: mealforge-dev
 services:
   postgres:
     image: postgres:16-alpine
-    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-mealforge}
       POSTGRES_USER: ${POSTGRES_USER:-mealforge}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run make init-env}
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mealforge} -d ${POSTGRES_DB:-mealforge}"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
       timeout: 3s
-      retries: 10
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:6379:6379"
+      retries: 20
+  migrate:
+    build: {context: ./apps/api}
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-mealforge}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mealforge}
+      APP_ENV: development
+    command: ["uv", "run", "--no-sync", "alembic", "upgrade", "head"]
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    build: {context: ./apps/api}
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-mealforge}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mealforge}
+      APP_ENV: development
+      APP_BASE_URL: http://localhost:3000
+      SESSION_SECRET: ${SESSION_SECRET:?Run make init-env}
+      RECIPE_REMOTE_IMPORT_ENABLED: "false"
+    ports: ["127.0.0.1:${API_PORT:-8000}:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=3)"]
       interval: 5s
-      timeout: 3s
-      retries: 10
+      timeout: 5s
+      retries: 20
+  web:
+    build: {context: ., dockerfile: apps/web/Dockerfile}
+    environment:
+      API_BASE_URL: http://api:8000
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports: ["127.0.0.1:${WEB_PORT:-3000}:3000"]
+    depends_on:
+      api: {condition: service_healthy}
 volumes:
   postgres_data:
