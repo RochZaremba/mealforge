@@ -1,6 +1,7 @@
 """Encrypted development DB backup; no passphrases in process arguments."""
 import os
 from pathlib import Path
+import re
 import stat
 import subprocess
 from datetime import datetime, timezone
@@ -21,7 +22,12 @@ os.umask(0o077)
 directory = root / "backups"
 directory.mkdir(exist_ok=True, mode=0o700)
 output = directory / (datetime.now(timezone.utc).strftime("mealforge-%Y%m%dT%H%M%S-%fZ.dump.enc"))
-command = ["docker", "compose", "--env-file", ".env", "-f", "compose.dev.yml", "exec", "-T", "postgres", "sh", "-c", 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc']
+snapshot = os.environ.get("BACKUP_SNAPSHOT")
+if snapshot and not re.fullmatch(r"[0-9A-Fa-f]+-[0-9A-Fa-f]+-[0-9]+", snapshot):
+    raise SystemExit("Nieprawidłowy identyfikator snapshotu PostgreSQL.")
+command = ["docker", "compose", "--env-file", ".env", "-f", "compose.dev.yml", "exec", "-T", "postgres", "sh", "-c", 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc "$@"', "backup"]
+if snapshot:
+    command += ["--snapshot", snapshot]
 ciphertext = output.with_suffix(".partial")
 with ciphertext.open("xb") as destination:
     dump = subprocess.Popen(command, cwd=root, stdout=subprocess.PIPE)

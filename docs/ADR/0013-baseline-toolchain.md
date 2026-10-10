@@ -14,3 +14,5 @@ No new application framework. Two lockfiles correspond to distinct runtimes. Hea
 
 ## Backup addendum
 Local backups use OpenSSL AES-256-CBC/PBKDF2 encryption and an outer HMAC-SHA256 with a domain-separated PBKDF2 key and random salt. Authentication is verified against a private immutable spool before decryption; tamper and wrong-password regression is mandatory. No passphrases in arguments/logs; file-based secrets and output mode 0600. This implements development backup/restore evidence; automated scheduling, remote storage/key custody and full production restore drill remain W06/release.
+
+W01 restore-test addendum: backup-test exports a PostgreSQL REPEATABLE READ snapshot and passes validated snapshot identifier to pg_dump as a separate argument. Compare every public table by count and length-framed SHA256 row fingerprints, without logging credentials/health values. This permits evidence for private tables after W01 and avoids races against ongoing writes during backup verification. Normal backup does not require an externally exported snapshot.

@@ -41,3 +41,8 @@ Actions38063054961 (f2bbfe6): all validation/test/build/E2E steps successful, ov
 Actions38066342121 (9ff35f1): direct API healthy, web failed HTTP readiness because Next CLI ran in monorepo root without app directory. Independently reproduced locally (exit1, missing root .next) and reviewer identified same. Fixed explicit start apps/web directory; local corrected startup on3002 and /status200 confirmed. Server logs attached to CI artifacts for failures. Next exact-head CI still required.
 
 W00 final gate: Actions38066767207 and38066764096 SUCCESS on exact head185425a108c614b4022c07a6860b956900058b88, including post-job cleanup. PR #1 merged62fe10c. W01-A tests not run yet.
+
+## W01-A work in progress
+- `uv run --project apps/api python scripts/test_nutrition_contract.py`: exit0,4 tests (unknown/required fields, true0, exact fractions, invalid/negative/precision, positive energy).
+- `uv run --project apps/api python scripts/validate_kit.py`:149passed0failed0skipped after schema change.
+- `make backup-test`: exit0; consistent exported PG snapshot → encrypted dump → restore → all2 tables/6rows equal. This run is before W01 private tables; private-record proof still pending.
