@@ -27,6 +27,8 @@ const routes: [RegExp, readonly string[]][] = [
   [new RegExp(`^households/${UUID}/recipes$`), ["GET", "POST"]],
   [new RegExp(`^households/${UUID}/recipes/${UUID}$`), ["GET", "PUT"]],
   [new RegExp(`^households/${UUID}/recipes/${UUID}/history$`), ["GET"]],
+  [new RegExp(`^households/${UUID}/recipe-links$`), ["GET", "POST"]],
+  [new RegExp(`^households/${UUID}/recipe-links/${UUID}$`), ["GET"]],
 ];
 const privateHeaders = { "Cache-Control": "no-store", Vary: "Cookie" };
 function problem(status: number, message: string, error_code: string) {
@@ -82,7 +84,7 @@ async function proxy(
     return problem(405, "Ta operacja nie jest dostępna.", "METHOD_NOT_ALLOWED");
   const incomingQuery = new URL(request.url).searchParams;
   const pagination = new URLSearchParams();
-  const listPage = request.method === "GET" && new RegExp(`^households/${UUID}/recipes$`).test(pathname);
+  const listPage = request.method === "GET" && new RegExp(`^households/${UUID}/(?:recipes|recipe-links)$`).test(pathname);
   const historyPage = request.method === "GET" && new RegExp(`^households/${UUID}/recipes/${UUID}/history$`).test(pathname);
   for (const [name, value] of incomingQuery) {
     if (incomingQuery.getAll(name).length !== 1)
