@@ -67,7 +67,7 @@ The separate demo button requires explicit confirmation. It creates a new owned 
 
 `make recipe-fixture-test` requires running Docker and verifies the original root fixture, installed API resource, audited server loader and actual API container equality. Missing or altered runtime originals fail demo creation atomically. Use IMPLEMENTATION_STATUS and TEST_REPORT for actual integration/CI/merge gates. W02 nutrition, W03 planning and later kitchen/offline functions are not completed.
 
-## Private source links W02-A (integration gates in progress)
+## Private source links W02-A (local gates passed; final CI/merge pending)
 
 On /recipes, select a household and use “Dodaj link”. Supply an HTTPS address, your own title and optional own note; confirm authorship only of your contribution. The server saves an immutable private bookmark. Viewer can read details; only editor/owner can save. Lists have bounded pagination. Source opens only after the explicit link click, with no page previews or background fetching. No edit/delete controls exist in A.
 

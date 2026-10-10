@@ -93,7 +93,7 @@ Recipe mutations write metadata-only audit and idempotency records in the same t
 
 Trusted original provenance comes exclusively from the packaged, bounded, audited fixture. Edited snapshots retain finite original attribution and a source-version reference, without copying an unbounded chain of historical snapshots. New user contributions have private rights with unknown license. No external recipe source adapter or fetch job is introduced.
 
-## W02-A schema (integrated; acceptance gates in progress)
+## W02-A schema (local gates passed; final CI/merge pending)
 
 Migration0005 adds separate `recipe_links`: UUID, household/user foreign keys, creation timestamp, validated opening `source_url`, deduplication `canonical_url`, ASCII host, nullable source ID, historical registry check date, own title/note and narrow authorship declaration. A bookmark creates no recipe, recipe version, ingredient identity or nutrition profile.
 

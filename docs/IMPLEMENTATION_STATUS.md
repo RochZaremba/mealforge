@@ -1,12 +1,12 @@
 # Status implementacji — aktualizuj po każdej fali
 
-**2026-10-11:** WAVE-00 oraz cała WAVE-01 ukończone i scalone po testach, review i CI. W01-C: PR4 mergedc3f58ee po exact13c1c83 CI PASS. WAVE-02-A: kod zapisu prywatnych linków zintegrowany, pełne testy i odbiór w toku; aplikacja nie jest jeszcze ukończona.
+**2026-10-11:** WAVE-00 oraz cała WAVE-01 ukończone i scalone po testach, review i CI. W01-C: PR4 mergedc3f58ee po exact13c1c83 CI PASS. WAVE-02-A: prywatne linki przeszły testy lokalne i niezależny review; PR5 oczekuje CI końcowego commita. Aplikacja nie jest jeszcze ukończona.
 
 | Wave | Status | Evidence |
 |---|---|---|
 | WAVE-00 | COMPLETE (tests run; CI PASS; merged) | PR #1 merged62fe10c; Actions38066767207+38066764096 PASS head185425a;16API/4PG,10E2E mobile+desktop,realCompose,backup restore; independent reviewer/security gate PASS; docs/TEST_REPORT.md |
 | WAVE-01 | COMPLETE (tests run; CI PASS; merged) | A PR2 d544a88; B PR3 7b1df55; C PR4 mergedc3f58ee:120API/24mobile+desktopE2E PASS, Docker fixture and14-table1464-row restore/privacy PASS; independent localreviewc880c5b accepted; exact13c1c83 Actions38091280517/38091277922 SUCCESS includingcleanup |
-| WAVE-02 | IN PROGRESS (A integrated; acceptance pending) | Link-only API/UI/pure URL policy plus 29 independent PG QA tests integrated; full regression/browser/Docker/restore/CI gate pending. No importer/parser/nutrition engine yet |
+| WAVE-02 | IN PROGRESS (A local PASS; final CI/merge pending) | PR5 link-only:247API/28mobile+desktopE2E PASS, Docker resources/migration/15-table2110-row restore/privacy PASS; independent localreview8e4dbb1 accepted. Parser/nutrition/providers remain next slices |
 | WAVE-03 | NOT STARTED | brak planera |
 | WAVE-04 | NOT STARTED | brak kitchen/inventory/shopping |
 | WAVE-05 | NOT STARTED | brak solvera |

@@ -134,7 +134,7 @@ Server-owned provenance distinguishes `original_fixture` text by MealForge (`CC0
 
 Demo requires the audited runtime fixture and creates two resident profiles (2700/1600 kcal, every macro null), five meal slots and three draft recipes in the same transaction. Missing or changed fixture aborts with 503, without partial household creation. Household DTO adds `source: user_created|demo_seed`; target DTO adds `source: user_set|demo_seed` and demo warnings. Legacy stored responses default only to their known pre-demo source semantics, preserving idempotent replay compatibility.
 
-## W02-A link-only contract (integrated; acceptance gates in progress)
+## W02-A link-only contract (local gates passed; final CI/merge pending)
 
 Authenticated household routes retain current authorization, private `no-store` responses and existing 16 KiB request bounds. POST requires editor/owner, trusted Origin, JSON, CSRF and UUID Idempotency-Key. Viewer may read; revoked access cannot read or replay a write.
 
