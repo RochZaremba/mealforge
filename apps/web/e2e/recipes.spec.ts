@@ -115,7 +115,7 @@ test('explicit separate demo and private recipe versions preserve real goals and
   await form.getByLabel('Ilość składnika 1', { exact: true }).fill('125.001');
   await form.getByRole('combobox', { name: 'Jednostka składnika 1', exact: true }).selectOption('g');
   await form.getByRole('combobox', { name: 'Stan składnika 1', exact: true }).selectOption('raw');
-  await form.getByLabel('Krok 1', { exact: true }).fill('Odważ składnik.');
+  await form.getByRole('textbox', { name: 'Krok 1', exact: true }).fill('Odważ składnik.');
   await form.getByLabel('Potwierdzam autorstwo własnego wkładu', { exact: true }).check();
   await page.evaluate(() => window.dispatchEvent(new Event('blur')));
   await confirmed(page, 'GET', '/api/v1/households', async () => {
@@ -123,7 +123,7 @@ test('explicit separate demo and private recipe versions preserve real goals and
   }, 200);
   await expect(form.getByLabel('Nazwa przepisu', { exact: true })).toHaveValue(ownTitle);
   await expect(form.getByLabel('Ilość składnika 1', { exact: true })).toHaveValue('125.001');
-  await expect(form.getByLabel('Krok 1', { exact: true })).toHaveValue('Odważ składnik.');
+  await expect(form.getByRole('textbox', { name: 'Krok 1', exact: true })).toHaveValue('Odważ składnik.');
   await expect(form.getByLabel('Potwierdzam autorstwo własnego wkładu', { exact: true })).toBeChecked();
   const created = await confirmed(page, 'POST', `/${demonstration.id}/recipes`, () => form.getByRole('button', { name: 'Zapisz przepis', exact: true }).click(), 201);
   const recipe = await created.json();
@@ -131,7 +131,7 @@ test('explicit separate demo and private recipe versions preserve real goals and
   expect(recipe.provenance.license).toBeNull();
   await unknowns(page);
   await page.getByTestId('recipe-detail').getByRole('button', { name: 'Edytuj przepis', exact: true }).click();
-  await form.getByLabel('Krok 1', { exact: true }).fill('Nowy własny opis przygotowania.');
+  await form.getByRole('textbox', { name: 'Krok 1', exact: true }).fill('Nowy własny opis przygotowania.');
   await form.getByLabel('Potwierdzam autorstwo własnego wkładu', { exact: true }).check();
   const saved = await confirmed(page, 'PUT', `/recipes/${recipe.id}`, () => form.getByRole('button', { name: 'Zapisz nową wersję', exact: true }).click(), 200);
   expect((await saved.json()).version).toBe(2);
@@ -220,7 +220,7 @@ test('a separate recipient account sees private recipes read-only and loses acce
     await recipient.reload();
     await recipient.getByRole('button', { name: 'Otwórz Przepis współdzielony QA', exact: true }).click();
     await recipient.getByRole('button', { name: 'Edytuj przepis', exact: true }).click();
-    await recipient.getByTestId('recipe-form').getByLabel('Krok 1', { exact: true }).fill('Niezapisany własny wkład.');
+    await recipient.getByTestId('recipe-form').getByRole('textbox', { name: 'Krok 1', exact: true }).fill('Niezapisany własny wkład.');
     await recipient.getByTestId('recipe-form').getByLabel('Potwierdzam autorstwo własnego wkładu', { exact: true }).check();
     const downgraded = await owner.request.put(`${base}/members/${membership.id}/access`, {
       headers: await mutationHeaders(owner, baseURL), data: { expected_version: editor.access_version,
@@ -243,7 +243,7 @@ test('a separate recipient account sees private recipes read-only and loses acce
     await recipient.reload();
     await recipient.getByRole('button', { name: 'Otwórz Przepis współdzielony QA', exact: true }).click();
     await recipient.getByRole('button', { name: 'Edytuj przepis', exact: true }).click();
-    await recipient.getByTestId('recipe-form').getByLabel('Krok 1', { exact: true }).fill('Niezapisany własny wkład.');
+    await recipient.getByTestId('recipe-form').getByRole('textbox', { name: 'Krok 1', exact: true }).fill('Niezapisany własny wkład.');
     await recipient.getByTestId('recipe-form').getByLabel('Potwierdzam autorstwo własnego wkładu', { exact: true }).check();
     const revoked = await owner.request.put(`${base}/members/${membership.id}/access`, {
       headers: await mutationHeaders(owner, baseURL), data: { expected_version: currentEditor.access_version,
