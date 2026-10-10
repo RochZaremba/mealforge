@@ -83,3 +83,8 @@ Final exact-head4eaf30c CI PASS: Actions38075073982+38075070579, including Postg
 - `make lint typecheck`: exit0 after final fingerprint-only client fix; Ruff/eslint/mypy27files/tsc PASS.
 - `make dev`: exit0; nonroot actual API/Next/PostgreSQL healthy, migration0003 complete, Docker production build11routes. Public ready200 and unauthenticated private API401/no-store through the real proxy.
 - `make backup-test privacy-test`: exit0;12tables/353rows consistent encrypted restore equal; actual UNIQUE error present without private bound sentinel. Invitation table exists; full live two-account invitation records and browser evidence still pending.
+
+### W01-B browser feedback loop (gate remains open)
+- Existing14A/W00browser regressions: `PLAYWRIGHT_NO_SERVER=1 make e2e` exit0,14passed9.8s against actual B Docker and final client fingerprint code.
+- Intermediatebf0e3d8 CI Actions38076686593/38076684209 SUCCESS (80API +14oldE2E); new B browser cases were not yet integrated, so this is not the final B gate.
+- First independent B two-account browser run: exit1,2failed at120s timeout selecting invitation member on both viewports. Actual DOM had repeated invitation sections/duplicate IDs. Root identified identical React sibling keys on InvitationManager and MealPresets; frontend fix and browser recheck pending. Tests will require exactly one invitation form rather than selecting the first duplicate. No raw codes are retained in browser traces/screenshots.
