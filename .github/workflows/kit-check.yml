@@ -44,6 +44,10 @@ jobs:
           node-version: '22'
           cache: pnpm
       - run: uv sync --directory apps/api --frozen
+      - name: Verify private PostgreSQL error logs
+        env:
+          POSTGRES_LOG_CONTAINER: ${{ job.services.postgres.id }}
+        run: uv run --directory apps/api python ../../scripts/test_database_log_privacy.py --configure-ci
       - run: pnpm install --frozen-lockfile
       - run: uv run --directory apps/api python ../../scripts/validate_kit.py
       - run: uv run --directory apps/api ruff check .

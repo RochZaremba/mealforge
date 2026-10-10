@@ -5,7 +5,7 @@
 | Wave | Status | Evidence |
 |---|---|---|
 | WAVE-00 | COMPLETE (tests run; CI PASS; merged) | PR #1 merged62fe10c; Actions38066767207+38066764096 PASS head185425a;16API/4PG,10E2E mobile+desktop,realCompose,backup restore; independent reviewer/security gate PASS; docs/TEST_REPORT.md |
-| WAVE-01 | IN PROGRESS | W01-A sessions/household/targets/slots; zaproszenia i przepisy jeszcze niezrealizowane |
+| WAVE-01 | IN PROGRESS | W01-A local VERIFIED:59API+14E2E, realDocker/migrations/11-tablebackup, independentQA/security/reviewer; PR2 finalCI pending. Zaproszenia/przepisy B/C niezrealizowane |
 | WAVE-02 | NOT STARTED | brak importera/nutrition engine |
 | WAVE-03 | NOT STARTED | brak planera |
 | WAVE-04 | NOT STARTED | brak kitchen/inventory/shopping |

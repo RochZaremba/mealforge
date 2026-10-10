@@ -55,3 +55,14 @@ W00 final gate: Actions38066767207 and38066764096 SUCCESS on exact head185425a10
 - `make lint typecheck build`: exit0; Ruff/eslint, mypy24sourcefiles, tsc, production Next build (11routes).
 - Independent security27 disposable-PG checks PASS; actualUvicorn productioncookie+40peerlimit despite changingXFF+5sbodydeadline PASS; pip-audit no known vulnerabilities after Argon2.
 - Independent reviewer fixes incorporated: immutable UPDATE/DELETE guards; client retry retains key until decoded success; two distinct accounts/sessions race same target/slots with200+409 exactlyone mutation, sameactor2sessions createkey exactlyonce. Actual browser transportfault proof pending.
+
+### W01-A actual Docker/browser/restore feedback loop
+- `make dev`: exit0; nonroot API/Next + PostgreSQL healthy; frozen runtime Argon2 installed, DB migration0002; first download took4m09s, no failure. Real ready200, private session401 unauth, /household200.
+- First `PLAYWRIGHT_NO_SERVER=1 make e2e`: exit2,12passed/2failed9.9s; test helper eagerly read nonexistent logout204body. Fix QA12a36ef preserves status/no-store and removes only irrelevant body-read. Actions38074465454/38074462843 on067c268 failed same helper, all previous gates passed.
+- After fix, full `PLAYWRIGHT_NO_SERVER=1 make e2e`: exit0,14passed9.0s (officialChrome156), mobile390×844/desktop1440×900. Actual register→login→household→secondmember→distinctexactnull/zero goals→history→repeat/slot edits→reload→logout401; real committed POST/truncated JSON retry samekey creates exactlyone member; private cache excluded.
+- Independent QA browser:4passed7.1s systemChromium153, own/tmp evidence/log; screenshots viewed and nooverflow/JSerrors. Root also viewed both complete household screenshots.
+- After securityepoch/keyguard, root `make lint typecheck build`: exit0 again.
+- `make backup-test`: exit0, real encrypted/authenticated dump with exported snapshot; disposable restore all11tables/224rows equal, including actual synthetic private target/history/session/audit/idempotency rows. Temp plaintext/backup/database removed.
+- Security actual duplicate bound-email probe found PG DETAIL privacy leak (P2). Compose PostgreSQL terse/panic/0 settings fixed; own security repeat confirms sentinel absent. `make privacy-test`: exit0, genuine UNIQUE error logged and private bound sentinel absent; no private payload print. CI adds same dedicated service probe.
+
+Final exact-head CI after helper/privacy fix still pending; wholeW01 remains incomplete (B/C).
