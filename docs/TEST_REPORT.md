@@ -65,4 +65,4 @@ W00 final gate: Actions38066767207 and38066764096 SUCCESS on exact head185425a10
 - `make backup-test`: exit0, real encrypted/authenticated dump with exported snapshot; disposable restore all11tables/224rows equal, including actual synthetic private target/history/session/audit/idempotency rows. Temp plaintext/backup/database removed.
 - Security actual duplicate bound-email probe found PG DETAIL privacy leak (P2). Compose PostgreSQL terse/panic/0 settings fixed; own security repeat confirms sentinel absent. `make privacy-test`: exit0, genuine UNIQUE error logged and private bound sentinel absent; no private payload print. CI adds same dedicated service probe.
 
-Final exact-head CI after helper/privacy fix still pending; wholeW01 remains incomplete (B/C).
+Final exact-head4eaf30c CI PASS: Actions38075073982+38075070579, including PostgreSQL privacy probe and14E2E. PR2 mergedd544a88. WholeW01 remains incomplete (B/C); B tests not run yet.
