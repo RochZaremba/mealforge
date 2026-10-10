@@ -69,6 +69,15 @@ export async function api<T>(
     options.body === undefined ? undefined : JSON.stringify(options.body);
   const action = `${options.session?.user.id ?? "anonymous"}:${method}:${path}:${serialized}`;
   const headers = new Headers();
+  let mutationKey: string | undefined;
+  const confirmOperation = () => {
+    if (
+      generation === authGeneration &&
+      mutationKey !== undefined &&
+      mutationKeys.get(action) === mutationKey
+    )
+      mutationKeys.delete(action);
+  };
   if (method !== "GET") {
     headers.set("Content-Type", "application/json");
     if (options.session) {
@@ -78,6 +87,7 @@ export async function api<T>(
         key = crypto.randomUUID();
         mutationKeys.set(action, key);
       }
+      mutationKey = key;
       headers.set("Idempotency-Key", key);
     }
   }
@@ -107,7 +117,7 @@ export async function api<T>(
       typeof window !== "undefined"
     )
       window.dispatchEvent(new Event("mealforge-session-expired"));
-    if (response.status < 500) mutationKeys.delete(action);
+    if (response.status < 500) confirmOperation();
     let payload: { message?: unknown; error_code?: unknown } = {};
     try {
       payload = await response.json();
@@ -127,7 +137,7 @@ export async function api<T>(
     );
   }
   if (response.status === 204) {
-    mutationKeys.delete(action);
+    confirmOperation();
     return undefined as T;
   }
   let result: T;
@@ -140,7 +150,7 @@ export async function api<T>(
       "Nie można potwierdzić odpowiedzi serwera. Spróbuj ponownie — zachowamy identyfikator tej operacji.",
     );
   }
-  mutationKeys.delete(action);
+  confirmOperation();
   return result;
 }
 export function errorMessage(error: unknown) {
