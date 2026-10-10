@@ -46,3 +46,12 @@ W00 final gate: Actions38066767207 and38066764096 SUCCESS on exact head185425a10
 - `uv run --project apps/api python scripts/test_nutrition_contract.py`: exit0,4 tests (unknown/required fields, true0, exact fractions, invalid/negative/precision, positive energy).
 - `uv run --project apps/api python scripts/validate_kit.py`:149passed0failed0skipped after schema change.
 - `make backup-test`: exit0; consistent exported PG snapshot → encrypted dump → restore → all2 tables/6rows equal. This run is before W01 private tables; private-record proof still pending.
+
+### W01-A integrated API/web checks
+- `make install migrate openapi check-contract`: exit0; frozen locks, dev migration0002 and exact generated OpenAPI.
+- Initial integrated Ruff: exit1 due QA import ordering; QA follow-up df5e968 fixes it, rerun below.
+- `make test migration-test` before new QA races: exit0,56pytest20.95s +integrity1+contract4, real disposable migration roundtrip.
+- After QA race/transport test integration: `make test`: exit0,59pytest25.59s no skips (25 independent QA cases), integrity1 and contract4 PASS.
+- `make lint typecheck build`: exit0; Ruff/eslint, mypy24sourcefiles, tsc, production Next build (11routes).
+- Independent security27 disposable-PG checks PASS; actualUvicorn productioncookie+40peerlimit despite changingXFF+5sbodydeadline PASS; pip-audit no known vulnerabilities after Argon2.
+- Independent reviewer fixes incorporated: immutable UPDATE/DELETE guards; client retry retains key until decoded success; two distinct accounts/sessions race same target/slots with200+409 exactlyone mutation, sameactor2sessions createkey exactlyonce. Actual browser transportfault proof pending.
