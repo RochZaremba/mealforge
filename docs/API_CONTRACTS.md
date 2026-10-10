@@ -95,7 +95,7 @@ GET /households returns households; POST creates owner and five real presets ato
 
 Invitations and private recipe catalogue remain next slices, not implemented endpoints in A. No implicit sample goals on real signup. Household scope is always checked, including idempotency replay.
 
-## W01-B contract (implementation in progress; not yet verified)
+## W01-B implemented contract (PR #3 merged; tests and review passed)
 
 All routes below require a session; mutations require trusted Origin, JSON, X-CSRF-Token and a UUID Idempotency-Key. Responses are private `no-store`. Household authorization requires an active member with `access_enabled=true`; changing access does not change resident participation or nutrition history.
 
@@ -112,3 +112,24 @@ Invitation metadata: `id`, `role`, nullable `member_id`, `expires_at`, `status` 
 Creation retries store only an invitation reference and regenerate the same code after current owner authorization. Secret rotation invalidates previous codes and regeneration. Acceptance retries reauthorize the current membership; a revoked account cannot regain access through replay. A consumed code with a new key is rejected. Code submission never appears in URLs, browser persistence or audit metadata. Invitation delivery is manual; the app sends no email.
 
 Linking an existing resident preserves member ID, targets, exact Decimal values, nulls, zeros and all profile history. Revoking account access preserves `active=true` and those same records. Guests cannot gain login access. Viewer reads are authorized but household writes are forbidden. Recipe catalogue remains W01-C.
+
+## W01-C contract (integration and verification pending)
+
+These routes extend the same authenticated, private `no-store` contract. Mutations require trusted Origin, JSON, X-CSRF-Token and UUID Idempotency-Key. Access is rechecked on each request and replay. No URL import, network fetch, validation or nutrition calculation is activated by this slice.
+
+| Method | Path | Input / result |
+|---|---|---|
+| GET | `/households/{id}/recipes` | `limit` 1–20 (default 20), optional UUID `after`; `{recipes: RecipeSummary[], next_cursor: UUID\|null}` ordered by recipe UUID ascending. |
+| POST | `/households/{id}/recipes` | Editor/owner; RecipeInput; 201 immutable first version. |
+| GET | `/households/{id}/recipes/{recipe_id}` | Current RecipeDetail; foreign household resources hidden with 404. |
+| PUT | `/households/{id}/recipes/{recipe_id}` | Editor/owner; complete RecipeInput plus strict positive integer `expected_version`; append a version, 409 on conflict. |
+| GET | `/households/{id}/recipes/{recipe_id}/history` | `limit` 1–5 (default 5), optional positive integer `before_version`; descending versions in `{history: RecipeDetail[], next_before_version: int\|null}`. |
+| POST | `/households/demo` | Authenticated user; `{confirmation: "create_separate_demo"}`; 201 `{household}` creates a separate owned demo atomically, never alters the selected household. |
+
+RecipeInput contains `title` (1–160 characters), `instructions` (1–30 plain text steps, each 1–500 characters), `ingredients` (1–40), and `rights_attestation: "i_am_author"`. Ingredient fields: `name` (1–160), required `amount` (null or exact positive Decimal string/JSON integer, up to 999999.999 and three fractional digits), `unit` (`g`, `ml`, `piece`, `unknown`) and `weight_state` (`raw`, `cooked`, `as_packaged`, `unknown`). Floats, booleans, exponent notation, excess precision and unknown input fields are rejected. No implicit conversion to grams. Actual UTF-8 request bodies remain limited to 16 KiB.
+
+RecipeSummary contains `id`, `household_id`, `version`, `title`, `created_at`, `status: "draft_requires_review"`, `planner_eligible: false` and `{code,message}` warnings. RecipeDetail adds `version_id`, instructions, ingredients and the complete version snapshot. Ingredient amounts are canonical strings or null. Nutrients (`kcal`, `protein_g`, `carbs_g`, `fat_g`, `fiber_g`) remain null, ingredient nutrient provenance is null, and all allergens remain `unknown`. Yield mass, preparation/cooking time, prices, storage method and validation reference remain null. `servings: 2` in original demo recipes expresses intentional recipe design; it does not assert measured yield or per-person energy. Other recipes have unknown servings. Recipe snapshots do not supply calculated calorie totals.
+
+Server-owned provenance distinguishes `original_fixture` text by MealForge (`CC0-1.0`, scope `original_recipe_text`) from `private_user_content` (private use, license unknown). Editing a demo recipe retains original attribution in `original_origin` and the previous immutable `source_version_id`; the new contribution does not automatically inherit CC0. User confirmation concerns their own contribution. License, origin, nutrient, safety and planner fields cannot be injected through RecipeInput.
+
+Demo requires the audited runtime fixture and creates two resident profiles (2700/1600 kcal, every macro null), five meal slots and three draft recipes in the same transaction. Missing or changed fixture aborts with 503, without partial household creation. Household DTO adds `source: user_created|demo_seed`; target DTO adds `source: user_set|demo_seed` and demo warnings. Legacy stored responses default only to their known pre-demo source semantics, preserving idempotent replay compatibility.
