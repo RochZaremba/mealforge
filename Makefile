@@ -30,6 +30,7 @@ check-contract:
 test:
 	$(UV) run --directory apps/api --env-file ../../.env pytest
 	python3 scripts/test_backup_integrity.py
+	$(UV) run --directory apps/api python ../../scripts/test_nutrition_contract.py
 lint:
 	$(UV) run --directory apps/api ruff check .
 	$(PNPM) lint

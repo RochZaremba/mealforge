@@ -23,6 +23,9 @@ jobs:
       DATABASE_URL: postgresql+psycopg://mealforge:ci_only_password@127.0.0.1:5432/mealforge_ci
       TEST_DATABASE_URL: postgresql+psycopg://mealforge:ci_only_password@127.0.0.1:5432/mealforge_test
       APP_ENV: test
+      APP_BASE_URL: http://127.0.0.1:3000
+      SESSION_SECRET: mealforge_ci_only_nonproduction_session_secret_64bytes_explicit
+      TRUSTED_ORIGINS: http://127.0.0.1:3000,http://localhost:3000
       API_BASE_URL: http://127.0.0.1:8000
       NEXT_TELEMETRY_DISABLED: "1"
     steps:
@@ -47,6 +50,7 @@ jobs:
       - run: uv run --directory apps/api mypy src
       - run: uv run --directory apps/api pytest
       - run: python3 scripts/test_backup_integrity.py
+      - run: uv run --directory apps/api python ../../scripts/test_nutrition_contract.py
       - run: uv run --directory apps/api bash ../../scripts/test_migrations.sh
       - run: uv run --directory apps/api python -m mealforge.openapi --output ../../contracts/openapi.yaml --check
       - run: pnpm lint
