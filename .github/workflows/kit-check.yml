@@ -45,6 +45,7 @@ jobs:
       - run: uv run --directory apps/api ruff check .
       - run: uv run --directory apps/api mypy src
       - run: uv run --directory apps/api pytest
+      - run: python3 scripts/test_backup_integrity.py
       - run: uv run --directory apps/api bash ../../scripts/test_migrations.sh
       - run: uv run --directory apps/api python -m mealforge.openapi --output ../../contracts/openapi.yaml --check
       - run: pnpm lint
@@ -52,6 +53,8 @@ jobs:
       - run: pnpm build
       - run: pnpm --filter @mealforge/web exec playwright install --with-deps chromium
       - name: Start real services and check mobile/desktop
+        env:
+          PLAYWRIGHT_NO_SERVER: "1"
         run: |
           uv run --directory apps/api alembic upgrade head
           uv run --directory apps/api uvicorn mealforge.main:app --host 127.0.0.1 --port 8000 > /tmp/mealforge-api.log 2>&1 &

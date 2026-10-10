@@ -1,20 +1,18 @@
 # MealForge — zestaw startowy repozytorium dla Codexa
 
-> Stan: **SPEC / AGENT BOOTSTRAP**. To NIE jest ukończona aplikacja. Repozytorium zawiera specyfikację produktu, decyzje architektoniczne, zadania, kontrakty i konfiguracje wyspecjalizowanych agentów. Kod aplikacji tworzy Codex w kolejnych falach.
+> Stan: **WAVE-00 w integracji i testach**. API/DB/web baseline powstaje jako pierwszy etap. Planowanie, nutrition, households i kuchnia wymagają WAVE-01–07; aplikacja nie jest jeszcze gotowym produktem.
 
 **Cel:** self-hosted PWA do planowania jedzenia dla dwóch osób (i gości), z osobnymi kaloriami i makro, wspólnym gotowaniem, meal prepem w słoikach/pojemnikach, magazynem, wydarzeniami i automatycznymi zakupami.
 
-## Start w 3 krokach
+## Uruchomienie baseline
 
 ```bash
-unzip MealForge_Codex_Agent_Kit.zip  # pomiń, jeśli już rozpakowane
-cd mealforge
-git init
-python3 scripts/validate_kit.py
-codex "$(cat PROMPT_START.txt)"
+make init-env
+make dev
+# http://localhost:3000/status
 ```
 
-Możesz również otworzyć katalog `mealforge` w IDE z Codexem i wkleić zawartość `PROMPT_START.txt`. Komenda `codex` wymaga wcześniej zainstalowanego i zalogowanego Codex CLI. Jeśli dostępna instalacja nie obsługuje custom subagents, agent główny wykonuje zadania sekwencyjnie według `docs/AGENT_WORKFLOW.md`.
+Docker Compose buduje realny API/web i migruje PostgreSQL. Dla lokalnego developmentu i quality gates: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Faktyczny zakres i testy: [status](docs/IMPLEMENTATION_STATUS.md), [test report](docs/TEST_REPORT.md).
 
 ## Najważniejsze pliki
 
@@ -35,7 +33,7 @@ Możesz również otworzyć katalog `mealforge` w IDE z Codexem i wkleić zawart
 python3 scripts/validate_kit.py
 ```
 
-Start zależności infra **dopiero po utworzeniu kodu przez agentów**: `docker compose -f compose.dev.yml up -d` uruchomi tylko PostgreSQL i Redis, nie uruchomi jeszcze aplikacji. W `docs/DEVELOPMENT.md` opisano docelowy `make dev`.
+`make deps` uruchamia wyłącznie PostgreSQL; `make dev` pełny baseline. Dane zewnętrzne nie są wymagane do uruchomienia.
 
 ## Priorytet produktu
 

@@ -11,3 +11,6 @@ The W00 PWA worker caches only its generic offline fallback and local icons; nev
 
 ## Consequences
 No new application framework. Two lockfiles correspond to distinct runtimes. Health and readiness are public, private endpoints require sessions from W01. Development Docker uses loopback ports; production TLS/release controls remain release checklist. New dependency licenses recorded in lockfile metadata and respective project manifests; external recipe APIs remain disabled.
+
+## Backup addendum
+Local backups use OpenSSL AES-256-CBC/PBKDF2 encryption and an outer HMAC-SHA256 with a domain-separated PBKDF2 key and random salt. Authentication is verified against a private immutable spool before decryption; tamper and wrong-password regression is mandatory. No passphrases in arguments/logs; file-based secrets and output mode 0600. This implements development backup/restore evidence; automated scheduling, remote storage/key custody and full production restore drill remain W06/release.

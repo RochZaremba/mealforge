@@ -1,4 +1,4 @@
-.PHONY: help init-env validate-kit deps install dev dev-local stop test lint typecheck e2e migrate migration-test openapi check-contract build backup
+.PHONY: help init-env validate-kit deps install dev dev-local stop test lint typecheck e2e migrate seed migration-test openapi check-contract build backup backup-test
 UV ?= uv
 PNPM ?= pnpm
 COMPOSE = docker compose --env-file .env -f compose.dev.yml
@@ -19,6 +19,8 @@ stop:
 	$(COMPOSE) stop
 migrate:
 	$(UV) run --directory apps/api --env-file ../../.env alembic upgrade head
+seed:
+	$(UV) run --directory apps/api --env-file ../../.env python -m mealforge.seed
 migration-test:
 	$(UV) run --directory apps/api --env-file ../../.env bash ../../scripts/test_migrations.sh
 openapi:
@@ -27,6 +29,7 @@ check-contract:
 	$(UV) run --directory apps/api python -m mealforge.openapi --output ../../contracts/openapi.yaml --check
 test:
 	$(UV) run --directory apps/api --env-file ../../.env pytest
+	python3 scripts/test_backup_integrity.py
 lint:
 	$(UV) run --directory apps/api ruff check .
 	$(PNPM) lint
@@ -36,8 +39,10 @@ typecheck:
 build:
 	$(PNPM) build
 e2e:
-	$(PNPM) e2e
+	$(UV) run --project apps/api --env-file .env $(PNPM) e2e
 dev-local:
 	python3 scripts/dev.py --uv $(UV) --pnpm $(PNPM)
+backup-test:
+	$(UV) run --project apps/api --env-file .env python scripts/test_backup_restore.py
 backup:
 	python3 scripts/backup.py

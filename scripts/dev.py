@@ -34,7 +34,7 @@ try:
     processes.append(subprocess.Popen([args.pnpm, "dev"], cwd=root, env=environment, start_new_session=True))
     while all(process.poll() is None for process in processes):
         time.sleep(1)
-    exit_code = next((process.returncode for process in processes if process.returncode is not None), 1)
+    exit_code = next((process.returncode for process in processes if process.returncode), 1)
 finally:
     cleanup()
 raise SystemExit(exit_code)
