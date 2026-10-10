@@ -180,6 +180,7 @@ class HouseholdResponse(BaseModel):
     currency: str
     role: str
     capabilities: dict[str, bool]
+    source: Literal["user_created", "demo_seed"] = "user_created"
 
 
 class HouseholdsResponse(BaseModel):
@@ -201,6 +202,7 @@ class TargetResponse(BaseModel):
     goal_type: str
     valid_from: str
     created_at: str
+    source: Literal["user_set", "demo_seed"] = "user_set"
     warnings: list[WarningResponse]
 
 

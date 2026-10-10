@@ -37,6 +37,7 @@ def household_dto(household: Household, member: HouseholdMember) -> dict[str, An
         "currency": household.currency,
         "role": member.role,
         "capabilities": capabilities(household, member),
+        "source": household.source,
     }
 
 
@@ -55,6 +56,13 @@ def target_dto(profile: NutritionProfile) -> dict[str, Any]:
         profile.fat_target_g,
     )
     warnings = []
+    if profile.source == "demo_seed":
+        warnings.append(
+            {
+                "code": "DEMO_TARGET",
+                "message": "Przykładowy cel demonstracyjny. Nie jest indywidualnym zaleceniem.",
+            }
+        )
     if all(value is not None for value in values):
         kcal, protein, carbs, fat = values
         assert kcal is not None and protein is not None and carbs is not None and fat is not None
@@ -76,6 +84,7 @@ def target_dto(profile: NutritionProfile) -> dict[str, Any]:
         "goal_type": profile.goal_type,
         "valid_from": profile.valid_from.isoformat(),
         "created_at": profile.created_at.isoformat(),
+        "source": profile.source,
         "warnings": warnings,
     }
 
@@ -211,6 +220,8 @@ def create_household(
         return household_dto(household, member)
 
     def replay_authorize(result: dict[str, Any]) -> None:
+        if "id" not in result:
+            raise ApiError(409, "IDEMPOTENCY_CONFLICT", "Identyfikator operacji został już użyty.")
         membership = authorize(db, auth, UUID(result["id"]), write=True)
         result["role"] = membership.role
         household = db.get(Household, UUID(result["id"]))
