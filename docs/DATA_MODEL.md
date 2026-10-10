@@ -83,7 +83,7 @@ Migration0003 adds `household_members.access_enabled` (default true) and `access
 
 Acceptance, access changes and private household operations serialize on the same household lock before invitation/member locks. Locked ORM reloads must refresh preloaded objects to avoid stale role or invitation status after concurrent revocation. Acceptance atomically links a resident, consumes the invitation, writes metadata-only audit and records idempotency. Session revocation and current authorization checks also apply on replay. Tests must prove single use across distinct accounts and preservation of the existing resident profile.
 
-## W01-C schema (integration and verification pending)
+## W01-C schema (PR #4 merged; gates passed)
 
 Migration0004 adds `households.source` with `user_created` for existing households and explicit `demo_seed` only for opt-in demo creation. Recipe identities in `recipes` carry UUID, household, current revision and timestamp. `recipe_versions` store scoped recipe UUID, positive version, acting user, timestamp and a Pydantic-validated JSONB snapshot. Snapshots preserve exact Decimal strings and unknown values; they do not claim normalized ingredient identities or verified nutrition. The deployed C schema is deliberately narrower than the future normalized recipe model above.
 

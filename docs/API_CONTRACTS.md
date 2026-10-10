@@ -113,7 +113,7 @@ Creation retries store only an invitation reference and regenerate the same code
 
 Linking an existing resident preserves member ID, targets, exact Decimal values, nulls, zeros and all profile history. Revoking account access preserves `active=true` and those same records. Guests cannot gain login access. Viewer reads are authorized but household writes are forbidden. Recipe catalogue remains W01-C.
 
-## W01-C contract (integration and verification pending)
+## W01-C implemented contract (PR #4 merged; gates passed)
 
 These routes extend the same authenticated, private `no-store` contract. Mutations require trusted Origin, JSON, X-CSRF-Token and UUID Idempotency-Key. Access is rechecked on each request and replay. No URL import, network fetch, validation or nutrition calculation is activated by this slice.
 

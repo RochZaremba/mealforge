@@ -59,7 +59,7 @@ make backup-test now compares every public table using an exported consistent sn
 ## Invitations W01-B (PR #3 merged)
 On /household the owner selects an existing non-login resident and editor/viewer access, creates a 24-hour single-use code and passes it privately. The recipient registers/logs in on their own account and enters the code in the join form. No email is sent. Owner-only account controls can revoke or restore access; resident participation, targets and history remain. Viewer sees profiles and slots without edit controls. The canonical owner cannot be demoted or revoked. Codes stay in ephemeral memory and JSON bodies, with no URL or persistent browser storage.
 
-## Private recipes W01-C (PR #4 final CI pending)
+## Private recipes W01-C (PR #4 merged; gates passed)
 
 Open /recipes after logging in. The current household selection is shared with /household and Today, retained only in memory and rechecked with the server. Create a private recipe by declaring ingredient amounts/units/states, writing your own instructions and confirming authorship of your contribution. Edits append immutable versions; history and list pages are reachable. Empty amount means unknown, not zero. Recipes remain drafts with unknown nutrition/allergens/yield/storage and cannot enter a planner.
 

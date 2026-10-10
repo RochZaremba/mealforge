@@ -128,3 +128,5 @@ W01-B final exact-headd650dd006ea62701ff2ef1bd4cd0b6442401c365 CI PASS: Actions3
 - Final root `PLAYWRIGHT_NO_SERVER=1 make e2e`: exit0,24passed27.1s, official bundled Chromium against actual C Docker; all16A/B/W00regressions and8Ccases. Initial Actions38090886410/38090835457 onca45423 failed the same nested textarea selector (logs confirmed); subsequentc880c5b CI and final documented head remain the merge gate. No checks skipped or production deployed.
 
 - Independent reviewer LOCAL integration PASSc880c5b after viewing mobile detail/pagination and desktop detail/viewer; production source70127bf unchanged by harness fix. Lead accepts the local gate. Final documented-head Actions including cleanup remain required before merge.
+
+W01-C final gate: exact13c1c834b5d3ea1484830fe1aa8af9fb08382d2f Actions38091280517+38091277922 SUCCESS, including120API/24E2E and cleanup. PR4 mergedc3f58ee7721595a21318b7ca71437ec1c91fd13f at2026-10-10T22:28:11Z (2026-10-11 Europe/Warsaw). WholeW01 COMPLETE. W02 has no runtime implementation yet; after main pull `make validate-kit`: exit0,154passed/0failed/0skipped before new contracts.

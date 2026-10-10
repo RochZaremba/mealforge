@@ -2,7 +2,7 @@
 
 - **Owner(s):** integrations + nutrition + backend + reviewer
 - **Dependencies:** WAVE-01
-- **Status:** NOT STARTED (initial kit)
+- **Status:** IN PROGRESS — A private link-only bookmark plan/ADR after W01 PR4 merge; runtime endpoints/parser/nutrition engine not implemented yet
 
 ## Implementation checklist
 
