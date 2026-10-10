@@ -66,3 +66,14 @@ W00 final gate: Actions38066767207 and38066764096 SUCCESS on exact head185425a10
 - Security actual duplicate bound-email probe found PG DETAIL privacy leak (P2). Compose PostgreSQL terse/panic/0 settings fixed; own security repeat confirms sentinel absent. `make privacy-test`: exit0, genuine UNIQUE error logged and private bound sentinel absent; no private payload print. CI adds same dedicated service probe.
 
 Final exact-head4eaf30c CI PASS: Actions38075073982+38075070579, including PostgreSQL privacy probe and14E2E. PR2 mergedd544a88. WholeW01 remains incomplete (B/C); B tests not run yet.
+
+## W01-B integrated gate (in progress)
+
+- `make migrate openapi check-contract`: exit0; real development migration0003 and generated OpenAPI match.
+- `make test migration-test` before independent B QA integration: exit0;65pytest27.46s, no skips (59A+6B), integrity1 and target-contract4 PASS; disposable migration up/check/seed/down/up/check/schema equality PASS.
+- Integrated web `pnpm lint && pnpm build && pnpm typecheck`: exit0;11routes; before final fingerprint-only retry fix. Final source needs browser/regression gate.
+- Integrated API Ruff/mypy: exit0;27sourcefiles.
+- Independent security:51actual disposable-PG checks PASS; expiry, rotation, reference-only idempotency, owner protection, revoked reads/list/replay, unchanged profiles. Client hashing/retry/auth-generation regression probes PASS.
+- Independent nutrition:27actual disposable-PG preservation assertions PASS across accept/viewer/revoke/restore/guest denial. Exact targets, nulls, zero, member/profile IDs and history unchanged.
+- Feedback loop: unsupported Pydantic Rust-regex lookahead prevented first independent test collection (exit2); backend replaced regex before integration. First combined agent run75/80 passed;5QA expectations corrected to assert both intentional metadata-only audit actions once each, and409canonical-owner protection. Corrected full test run pending; no failing invariant suppressed.
+- Deterministic distinct-session concurrency, actual Docker/two-account mobile+desktop browser, restore, final reviews and exact-head CI remain pending. PR #3 is draft; B is not complete.
