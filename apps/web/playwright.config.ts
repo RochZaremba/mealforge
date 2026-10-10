@@ -42,7 +42,9 @@ export default defineConfig({
           command: 'node ./e2e/start-production.mjs',
           url: webURL,
           env: { NEXT_TELEMETRY_DISABLED: '1', API_BASE_URL: apiURL },
-          reuseExistingServer: !process.env.CI,
+          // A running dev server does not register the worker; explicitly opt out
+          // of management with PLAYWRIGHT_NO_SERVER for an existing production server.
+          reuseExistingServer: false,
           timeout: 180_000,
         },
       ],
