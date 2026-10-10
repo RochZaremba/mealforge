@@ -1,11 +1,13 @@
 import pytest
 from alembic import command
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine, func, inspect, select, text
+from sqlalchemy import Engine, func, select, text
 from sqlalchemy.exc import IntegrityError
 
 from mealforge.core.config import Settings
 from mealforge.core.database import database_is_ready, migration_config, session_factory
+from mealforge.households.models import Household, NutritionProfile
+from mealforge.identity.models import User
 from mealforge.main import create_app
 from mealforge.reference.models import MealSlotDefinition
 from mealforge.seed import seed_reference_data
@@ -42,10 +44,9 @@ def test_reference_seed_is_idempotent_and_non_private(
         )
     assert count == 5
     assert names == ["Śniadanie", "Drugie śniadanie", "Obiad", "Przekąska", "Kolacja"]
-    assert set(inspect(migrated_engine).get_table_names()) == {
-        "alembic_version",
-        "meal_slot_definitions",
-    }
+    with migrated_engine.connect() as connection:
+        for table in (User, Household, NutritionProfile):
+            assert connection.scalar(select(func.count()).select_from(table)) == 0
 
 
 def test_persistence_unit_of_work_rolls_back(migrated_engine: Engine) -> None:

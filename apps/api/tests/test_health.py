@@ -73,12 +73,15 @@ def test_internal_errors_are_sanitized(caplog: pytest.LogCaptureFixture) -> None
     assert response.json()["request_id"] == response.headers["x-request-id"]
 
 
-def test_openapi_is_deterministic_and_only_implements_baseline() -> None:
+def test_openapi_is_deterministic_and_excludes_unimplemented_domains() -> None:
     import json
 
     assert generate_openapi() == generate_openapi()
     specification = json.loads(generate_openapi())
-    assert set(specification["paths"]) == {"/health", "/ready"}
+    assert {"/health", "/ready"} <= set(specification["paths"])
+    assert not any(
+        "recipe" in path or "invite" in path or "plans" in path for path in specification["paths"]
+    )
     assert (
         "application/problem+json"
         in specification["paths"]["/ready"]["get"]["responses"]["503"]["content"]
