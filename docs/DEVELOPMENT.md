@@ -56,7 +56,13 @@ APP_BASE_URL/TRUSTED_ORIGINS must match browser origins on both API/web; local d
 
 make backup-test now compares every public table using an exported consistent snapshot; private values are not printed. W01 actual restore proof includes11tables/224rows, including synthetic goals and history, sessions/audit/idempotency. Evidence screenshots contain synthetic QA accounts and targets only.
 
-## Invitations W01-B (final review in progress)
+## Invitations W01-B (PR #3 merged)
 On /household the owner selects an existing non-login resident and editor/viewer access, creates a 24-hour single-use code and passes it privately. The recipient registers/logs in on their own account and enters the code in the join form. No email is sent. Owner-only account controls can revoke or restore access; resident participation, targets and history remain. Viewer sees profiles and slots without edit controls. The canonical owner cannot be demoted or revoked. Codes stay in ephemeral memory and JSON bodies, with no URL or persistent browser storage.
 
-Until W01-C the recipe catalogue remains unavailable; W02 nutrition, W03 planning and later kitchen/offline functions are not completed. Use IMPLEMENTATION_STATUS and TEST_REPORT for the actual integration/CI gate, not the presence of a screen alone.
+## Private recipes W01-C (PR #4 final CI pending)
+
+Open /recipes after logging in. The current household selection is shared with /household and Today, retained only in memory and rechecked with the server. Create a private recipe by declaring ingredient amounts/units/states, writing your own instructions and confirming authorship of your contribution. Edits append immutable versions; history and list pages are reachable. Empty amount means unknown, not zero. Recipes remain drafts with unknown nutrition/allergens/yield/storage and cannot enter a planner.
+
+The separate demo button requires explicit confirmation. It creates a new owned household with two sample targets2700/1600 (all macros unknown), five slots and three original MealForge drafts. No demo is seeded by startup, signup or real household creation. Existing real goals/history remain unchanged. Original text is CC0 only within its declared scope; new private user edits have unknown license and retain original attribution. No external recipe fetch is activated.
+
+`make recipe-fixture-test` requires running Docker and verifies the original root fixture, installed API resource, audited server loader and actual API container equality. Missing or altered runtime originals fail demo creation atomically. Use IMPLEMENTATION_STATUS and TEST_REPORT for actual integration/CI/merge gates. W02 nutrition, W03 planning and later kitchen/offline functions are not completed.
