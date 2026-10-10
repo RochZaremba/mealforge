@@ -330,7 +330,7 @@ function MemberCard({
           Historia celów {member.display_name}
         </button>
       </div>
-      {editing && (
+      {editing && canEdit && (
         <form onSubmit={save} className="target-form">
           <fieldset disabled={busy}>
             <p className="note">
