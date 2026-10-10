@@ -45,6 +45,8 @@ class HouseholdMember(Base):
     is_guest: Mapped[bool] = mapped_column(default=False)
     active: Mapped[bool] = mapped_column(default=True)
     target_revision: Mapped[int] = mapped_column(default=0)
+    access_enabled: Mapped[bool] = mapped_column(default=True, server_default="true")
+    access_version: Mapped[int] = mapped_column(default=0, server_default="0")
 
 
 class NutritionProfile(Base):
@@ -120,3 +122,27 @@ class IdempotencyRecord(Base):
     fingerprint: Mapped[str] = mapped_column(String(64))
     result: Mapped[dict[str, object]] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class HouseholdInvitation(Base):
+    __tablename__ = "household_invitations"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["member_id", "household_id"],
+            ["household_members.id", "household_members.household_id"],
+        ),
+        CheckConstraint("role IN ('editor','viewer')", name="ck_invitation_role"),
+        CheckConstraint("version >= 1", name="ck_invitation_version"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    household_id: Mapped[UUID] = mapped_column(ForeignKey("households.id"), index=True)
+    member_id: Mapped[UUID | None]
+    role: Mapped[str] = mapped_column(String(12))
+    private_nonce: Mapped[str] = mapped_column(String(64))
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    accepted_by_user_id: Mapped[UUID | None] = mapped_column(ForeignKey("users.id"))
+    version: Mapped[int] = mapped_column(default=1)
