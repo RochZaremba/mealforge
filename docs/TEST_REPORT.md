@@ -99,4 +99,15 @@ Final exact-head4eaf30c CI PASS: Actions38075073982+38075070579, including Postg
 - After actual B browser writes, `make backup-test`: exit0,12tables554rows exact; snapshot includes2actual invitation records plus42profiles/112audit/110idempotency rows. Counts only; no private values printed.
 - Final local source review: docs/reviews/WAVE-01-B.md. Exact final-head CI remains merge gate; priorbf0 CI did not include new B browser cases.
 
-W01-B final exact-headd650dd006ea62701ff2ef1bd4cd0b6442401c365 CI PASS: Actions38082688574+38082684928, including83API/16E2E and cleanup. Final root `make lint typecheck build`: exit0,27API sourcefiles/11web routes. PR3 merged7b1df55703acbff3a86c3a94ad725d85a0950678 at2026-10-10T20:13:46Z. W01-C starts only after this gate; no C tests or feature success yet.
+W01-B final exact-headd650dd006ea62701ff2ef1bd4cd0b6442401c365 CI PASS: Actions38082688574+38082684928, including83API/16E2E and cleanup. Final root `make lint typecheck build`: exit0,27API sourcefiles/11web routes. PR3 merged7b1df55703acbff3a86c3a94ad725d85a0950678 at2026-10-10T20:13:46Z. W01-C starts only after this gate.
+
+## W01-C worktree checks — 2026-10-11 (gate pending)
+
+- `python3 scripts/validate_kit.py`: exit0,153passed/0failed/0skipped after original fixture integration. Lead plan/ADR0016 preceded production changes.
+- Independent QA actual isolated PostgreSQL `tests/test_recipes_security.py`: exit0,25passed27.70s. Recipe create/update/history, household roles/revoked replay, Decimal rejection, composite FK and immutable snapshots, separate demo, concurrent retry and reachable pages checked. Commit68c5e8a; final regression fixes pending.
+- Backend first combined new QA+W00 run:29passed30.58s; Ruff/mypy34 source files PASS. Final full regression not yet accepted: stale historical assertions required updates for newly implemented recipe routes and additive household source.
+- Nutrition independent70DTO/source assertions PASS;3targeted actual PostgreSQL tests PASS4.90s. Thirteen exact amounts/states, unknown nutrients/allergens/yield/storage, no ml/piece conversion, unchanged real profile columns after explicit demo.
+- Security independent26DTO+72actual isolated PostgreSQL assertions PASS. Viewer can create a separate owned demo; original CC0/private edit lineage, tenant/replay checks, strict input, immutable/deferred FK, fixture tamper/oversize fail closed. Final frontend acceptance remains open.
+- Integrations independent59provenance assertions and5runtime fixture tests PASS. No activated external fetch; private user edits do not inherit CC0.
+- Lead `uv run --directory /home/roch/programing/mealforge-worktrees/backend-c/apps/api python /home/roch/programing/mealforge/scripts/check_original_recipes.py`: exit0, root/installed fixture equality and audited runtime loader PASS. Docker C packaging not checked yet; current healthy containers still run B.
+- Frontend review found/fixes in progress: late A member POST contaminating B view; focus destroying unsaved recipe draft; approved pagination parameters discarded before proxy fetch. Actual deterministic browser regression required for all three. No C mobile/desktop success claimed yet.
