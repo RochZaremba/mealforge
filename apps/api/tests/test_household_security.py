@@ -1,24 +1,26 @@
 """Independent W01-A acceptance against a real, isolated PostgreSQL database."""
 
 from collections.abc import Callable, Iterator
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import ExitStack
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
+from threading import Barrier
 from uuid import UUID, uuid4
 from zoneinfo import ZoneInfo
 
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from mealforge.households.models import AuditEvent, HouseholdMember, NutritionProfile
-from mealforge.identity.models import ServerSession, User
 from pydantic import SecretStr
 from sqlalchemy import Engine, func, inspect, select
 from sqlalchemy.orm import Session
 
 from mealforge.core.config import Settings
+from mealforge.households.models import AuditEvent, HouseholdMember, NutritionProfile
+from mealforge.identity.models import ServerSession, User
 from mealforge.main import create_app
 
 pytestmark = pytest.mark.integration
@@ -483,3 +485,108 @@ def test_member_payload_cannot_grant_access_to_another_account(
     assert [
         item["id"] for item in foreign.client.get("/api/v1/households").json()["households"]
     ] == [foreign.household_id]
+
+
+def shared_editor(new_client: ClientFactory, engine: Engine) -> tuple[Account, Account]:
+    owner, editor = account(new_client), account(new_client)
+    # Invitations are a later slice. This legitimate membership is a DB fixture,
+    # while every authorization/session/mutation below goes through the real API.
+    with Session(engine) as session, session.begin():
+        session.add(
+            HouseholdMember(
+                household_id=UUID(owner.household_id),
+                user_id=UUID(editor.user_id),
+                display_name="Edytor QA",
+                role="editor",
+                is_guest=False,
+                active=True,
+                target_revision=0,
+            )
+        )
+    return owner, editor
+
+
+@pytest.mark.parametrize("resource", ["target", "slots"])
+def test_distinct_actors_racing_same_version_produce_one_commit(
+    new_client: ClientFactory,
+    migrated_engine: Engine,
+    resource: str,
+) -> None:
+    owner, editor = shared_editor(new_client, migrated_engine)
+    headers = [mutation_headers(owner.client), mutation_headers(editor.client)]
+    if resource == "target":
+        path = target_path(owner)
+        bodies = [target_body(), {**target_body(), "kcal_target": "1600"}]
+        expected_after = 1
+    else:
+        path = f"/api/v1/households/{owner.household_id}/meal-slot-presets"
+        initial = owner.client.get(path).json()
+        slots = [
+            {key: value for key, value in slot.items() if key != "ordering"}
+            for slot in initial["slots"]
+        ]
+        bodies = []
+        for name in ["Śniadanie właściciela", "Śniadanie edytora"]:
+            variant = [dict(slot) for slot in slots]
+            variant[0]["name"] = name
+            bodies.append({"expected_version": initial["version"], "slots": variant})
+        expected_after = initial["version"] + 1
+    gate = Barrier(2)
+    before = audit_count(migrated_engine)
+
+    def write(index: int) -> int:
+        client = [owner.client, editor.client][index]
+        gate.wait(timeout=10)
+        return client.put(path, json=bodies[index], headers=headers[index]).status_code
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        statuses = list(executor.map(write, [0, 1]))
+    assert sorted(statuses) == [200, 409]
+    assert audit_count(migrated_engine) == before + 1
+    if resource == "target":
+        history = owner.client.get(path + "/history").json()["history"]
+        assert [item["version"] for item in history] == [expected_after]
+        assert history[0]["kcal_target"] in {"2700.125", "1600"}
+        with Session(migrated_engine) as session:
+            assert session.scalar(select(func.count()).select_from(NutritionProfile)) == 1
+    else:
+        saved = owner.client.get(path).json()
+        assert saved["version"] == expected_after
+        assert len(saved["slots"]) == 5
+        assert saved["slots"][0]["name"] in {"Śniadanie właściciela", "Śniadanie edytora"}
+
+
+def test_independent_sessions_of_same_actor_share_exactly_once_create_key(
+    new_client: ClientFactory,
+    migrated_engine: Engine,
+) -> None:
+    owner = account(new_client)
+    email = owner.client.get("/api/v1/auth/session").json()["user"]["email"]
+    other = new_client()
+    login = other.post(
+        "/api/v1/auth/login",
+        json={"email": email, "password": PASSWORD},
+        headers={"Origin": ORIGIN},
+    )
+    assert login.status_code == 200
+    assert other.cookies.get("mealforge_session") != owner.client.cookies.get("mealforge_session")
+    key = str(uuid4())
+    headers = [mutation_headers(owner.client, key), mutation_headers(other, key)]
+    body = {"name": f"Jedna operacja {uuid4().hex}"}
+    gate = Barrier(2)
+    before = audit_count(migrated_engine)
+
+    def create(index: int) -> tuple[int, dict]:
+        client = [owner.client, other][index]
+        gate.wait(timeout=10)
+        response = client.post("/api/v1/households", json=body, headers=headers[index])
+        return response.status_code, response.json()
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        responses = list(executor.map(create, [0, 1]))
+    assert [status for status, _ in responses] == [201, 201]
+    assert responses[0][1] == responses[1][1]
+    assert audit_count(migrated_engine) == before + 1
+    households = owner.client.get("/api/v1/households").json()["households"]
+    assert len(households) == 2
+    assert len([item for item in households if item["name"] == body["name"]]) == 1

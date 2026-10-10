@@ -164,3 +164,71 @@ test('private household persists two separate nullable targets, history and edit
   await expect(page.getByLabel('E-mail', { exact: true })).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test('retry after a committed but truncated confirmation reuses its operation key', async ({ page }) => {
+  test.setTimeout(90_000);
+  const identifier = randomUUID();
+  const email = `qa-retry-${identifier}@example.invalid`;
+  const password = `Qa-${identifier}!`;
+  await page.goto('/household');
+  await page.getByRole('button', { name: 'Załóż konto', exact: true }).click();
+  await page.getByLabel('E-mail', { exact: true }).fill(email);
+  await page.getByLabel('Hasło', { exact: true }).fill(password);
+  await page.getByLabel('Twoje imię', { exact: true }).fill('Retry QA');
+  await confirmed(page, 'POST', '/auth/register', () => (
+    page.getByRole('button', { name: 'Utwórz konto', exact: true }).click()
+  ), 201);
+  await expect(page.getByText('Konto utworzone. Zaloguj się.', { exact: true })).toBeVisible();
+  await page.getByLabel('Hasło', { exact: true }).fill(password);
+  await confirmed(page, 'POST', '/auth/login', () => (
+    page.getByRole('button', { name: 'Zaloguj się', exact: true }).click()
+  ), 200);
+  await page.getByLabel('Nazwa gospodarstwa', { exact: true }).fill(`Retry dom ${identifier}`);
+  const created = await confirmed(page, 'POST', '/api/v1/households', () => (
+    page.getByRole('button', { name: 'Utwórz gospodarstwo', exact: true }).click()
+  ), 201);
+  const household = await created.json();
+  await expect(page.getByTestId('member-card')).toHaveCount(1);
+  const path = `/api/v1/households/${household.id}/members`;
+  const keys: string[] = [];
+  let corrupted = false;
+  await page.route(`**${path}`, async (route) => {
+    if (route.request().method() !== 'POST') {
+      await route.continue();
+      return;
+    }
+    keys.push(route.request().headers()['idempotency-key']);
+    if (corrupted) {
+      await route.continue();
+      return;
+    }
+    // This reaches and commits the real API. Only the confirmation is corrupted.
+    const upstream = await route.fetch();
+    expect(upstream.status()).toBe(201);
+    corrupted = true;
+    await route.fulfill({ response: upstream, body: '{"id":', contentType: 'application/json' });
+  });
+  await page.getByLabel('Imię domownika', { exact: true }).fill('Domownik po retry');
+  await page.getByRole('button', { name: 'Dodaj domownika', exact: true }).click();
+  await expect(page.getByRole('alert')).toBeVisible();
+  await expect(page.getByTestId('member-card')).toHaveCount(1);
+  const afterCommit = await page.request.get(path);
+  expect(afterCommit.status()).toBe(200);
+  expect((await afterCommit.json()).members.filter((member: { display_name: string }) => (
+    member.display_name === 'Domownik po retry'
+  ))).toHaveLength(1);
+
+  await confirmed(page, 'POST', '/members', () => (
+    page.getByRole('button', { name: 'Dodaj domownika', exact: true }).click()
+  ), 201);
+  await expect(page.getByTestId('member-card')).toHaveCount(2);
+  expect(keys).toHaveLength(2);
+  expect(keys[0]).toBeTruthy();
+  expect(keys[1]).toBe(keys[0]);
+  const afterRetry = await page.request.get(path);
+  const members = (await afterRetry.json()).members;
+  expect(members).toHaveLength(2);
+  expect(members.filter((member: { display_name: string }) => (
+    member.display_name === 'Domownik po retry'
+  ))).toHaveLength(1);
+});
