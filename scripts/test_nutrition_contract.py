@@ -33,7 +33,7 @@ class TargetContractTests(unittest.TestCase):
 
     def test_invalid_or_lossy_macro_values_are_rejected(self):
         for value in (-1, "-1", "unknown", "NaN", "1e2", "01", "0.0001",
-                      "1000000", "1,2", " 1", True, 1.125):
+                      "1000000", "1,2", " 1", "1\n", True, 1.125):
             with self.subTest(value=value):
                 self.assertFalse(self.validator.is_valid(self.target(protein_target_g=value)))
 
