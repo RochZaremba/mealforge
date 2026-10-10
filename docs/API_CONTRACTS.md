@@ -1,6 +1,6 @@
 # API v1 — kontrakty use-case
 
-**Prefiks:** `/api/v1`. JSON; auth przez bezpieczne cookies lub sesję z CSRF policy. W odpowiedziach `problem+json` z `error_code`, `message`, `request_id`, `field_errors` (opcjonalnie). API generuje docelowy OpenAPI z kodu FastAPI. `contracts/openapi.yaml` to projekt startowy — w WAVE-00 zastąpić zsynchronizowaną specyfikacją.
+**Prefiks:** `/api/v1`. JSON; auth przez bezpieczne cookies lub sesję z CSRF policy. W odpowiedziach `problem+json` z `error_code`, `message`, `request_id`, `field_errors` (opcjonalnie). API generuje docelowy OpenAPI z kodu FastAPI. `contracts/openapi.yaml` jest generowane z działającego API; tabela docelowa poniżej zawiera również funkcje przyszłych fal.
 
 ## Mutations
 
@@ -87,3 +87,10 @@ Odpowiedź 200 dopiero po transakcyjnym zatwierdzeniu; 409 `PLAN_VERSION_CONFLIC
 ## Statusy odpowiedzi
 
 - 401 brak sesji, 403 brak uprawnień, 404 brak zasobu lub ukrywanie cudzych zasobów, 409 konflikt, 422 walidacja / brak danych, 424 niezależne API niedostępne bez wpływu na core, 429 limit, 503 niegotowość serwisu.
+
+## W01-A implemented contract (in progress; OpenAPI after integration)
+Auth register requires explicit subsequent login. GET /auth/session returns user, csrf_token and expires_at, never the raw session cookie. Trusted Origin and application/json for POST/PUT; authenticated mutations additionally X-CSRF-Token. Private responses no-store. Household mutations require Idempotency-Key (UUID), expected_version for target/slot updates; logout revokes and does not need an idempotency key.
+
+GET /households returns households; POST creates owner and five real presets atomically. GET /households/{id}/members returns members; POST adds a non-login resident or guest, not account access. PUT /households/{id}/members/{member_id}/nutrition-target appends history; GET .../nutrition-target/history reads it. GET/PUT /households/{id}/meal-slot-presets returns version and slots with id/name/ordering/default_time/default_share/repeat_weekly. Unknown targets null, true zero macro accepted, kcal known must be >0. Decimal strings up to6 integer and3 fraction digits, integer JSON accepted, fractional JSON float forbidden. Source user_set; immutable history. UI must distinguish target from consumed/calculated nutrition.
+
+Invitations and private recipe catalogue remain next slices, not implemented endpoints in A. No implicit sample goals on real signup. Household scope is always checked, including idempotency replay.

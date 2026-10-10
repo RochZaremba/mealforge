@@ -7,10 +7,14 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException
 
+from mealforge.core.api import ApiError
+from mealforge.core.body_limit import BodyLimitMiddleware
 from mealforge.core.config import Settings
 from mealforge.core.database import build_engine, database_is_ready
 from mealforge.core.problems import HealthResponse, Problem, ReadyResponse
 from mealforge.core.request_id import RequestIdMiddleware
+from mealforge.households.routes import router as household_router
+from mealforge.identity.routes import router as identity_router
 
 
 def problem_response(request: Request, status: int, code: str, message: str) -> JSONResponse:
@@ -43,7 +47,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openapi_url=None,
     )
     application.state.engine = engine
+    application.state.settings = settings
+    application.add_middleware(BodyLimitMiddleware)
     application.add_middleware(RequestIdMiddleware)
+    application.include_router(identity_router)
+    application.include_router(household_router)
+
+    @application.exception_handler(ApiError)
+    async def api_error(request: Request, exc: ApiError) -> JSONResponse:
+        return problem_response(request, exc.status, exc.code, exc.message)
 
     @application.exception_handler(HTTPException)
     async def http_error(request: Request, exc: HTTPException) -> JSONResponse:

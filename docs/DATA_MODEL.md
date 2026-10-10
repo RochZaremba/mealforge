@@ -7,7 +7,7 @@ Kontrakty poniżej opisują minimalny schemat logiczny. SQLAlchemy + Alembic ma 
 - `users(id, email unique, display_name, created_at)`
 - `households(id, name, owner_id, timezone, currency, created_at)`
 - `household_members(id, household_id, user_id?, display_name, role, is_guest, active)`; `role` owner/editor/viewer; guest może być profilem bez loginu.
-- `nutrition_profiles(id, member_id, kcal_target, protein_target_g, carb_target_g, fat_target_g, activity, goal_type, valid_from, valid_to)`; profile versioned.
+- `nutrition_profiles(id, member_id, kcal_target, protein_target_g, carbs_target_g, fat_target_g, activity, goal_type, valid_from, valid_to)`; profile versioned.
 - `member_restrictions(id, member_id, ingredient_id?, allergen_code?, restriction_type, severity, note)`.
 - `meal_slot_presets(id, household_id, slot_name, ordering, default_share, default_time)`; standardowych 5, włączanie per member/day.
 
@@ -69,3 +69,8 @@ Kontrakty poniżej opisują minimalny schemat logiczny. SQLAlchemy + Alembic ma 
 ## Stany importu
 
 `link_only` → (ręczne dane użytkownika) `draft_requires_review` → `normalized` → `nutrition_verified` → `validated`; błędy/licencje: `quarantined` / `rights_denied`.
+
+## W01-A schema implementation (pending integrated gate)
+Migration0002 adds users/password_hash (Argon2id), sessions/token_hash only with expiry/revocation, auth_rate_buckets with HMAC keys and finite windows; households with slot_revision; household_members with target_revision, composite id/household uniqueness and guest-no-login check; nutrition_profiles immutable version rows, composite household/member FK and Numeric(9,3) nullable targets; meal_slot_presets active rows with local time, nullable exact share, repeat_weekly; audit_events metadata only; idempotency_records actor/scope/key with fingerprint and private JSON result.
+
+Transactions lock the authenticated session for revocation consistency, member for target expected_version and household for slot revision. Idempotency uses a transaction-scoped PostgreSQL advisory lock; replay reauthorizes membership. Profile valid_from is a local date and cannot be future in A; history stays immutable. Guests/unlinked residents never authorize an account. Recipe/inventory/planning tables above remain requirements for future slices.

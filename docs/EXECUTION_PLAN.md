@@ -1,6 +1,6 @@
 # Execution plan — 2026-10-10
 
-## WAVE-00: runnable baseline (local gates PASS; final PR CI pending)
+## WAVE-00: runnable baseline (COMPLETE; PR #1 merged)
 Cel: rzeczywiste FastAPI + PostgreSQL + Next.js, uruchamialne lokalnie i przez Docker Compose. Zakres nie obejmuje jeszcze prywatnych danych ani planowania.
 
 | Owner | Branch / worktree | Exclusive files |
@@ -21,3 +21,14 @@ Testy: validate_kit, pytest (PostgreSQL), Ruff, mypy, OpenAPI drift, Alembic rou
 
 ## Następna fala
 WAVE-01 dopiero po zielonym gate W00: sessions/auth/household/profile history/5 editable slots/original recipes. Przed implementacją nowy plan i ADR sesji. B/W/T demo pozostają null dopóki użytkownik nie poda wartości; kalorie 2700/1600 tylko jawny demo seed.
+
+## WAVE-01-A: sessions and household onboarding
+Goal: authenticated private household with two independently editable member targets and real persisted daily meal-slot settings. Dependencies: W00 merged62fe10c, exact-head185425a CI and independent reviews PASS. No production deployment.
+
+Ownership (separate worktrees/branches based on62fe10c): backend apps/api/** except QA security test; frontend apps/web/** except e2e/config; QA apps/web/e2e/households.spec.ts + apps/api/tests/test_household_security.py; nutrition fixtures/original-recipes.json and review; integrations/security read-only audit; lead contracts/docs/infra/OpenAPI/integration. No overlapping edits.
+
+API /api/v1: auth register/login/session/logout; household list/create/read; member list/create; nutrition-target PUT expected_version and GET history; meal-slot-presets GET/PUT expected_version. Numeric target values Decimal strings or integers, unknown null, zero macro valid. No automatic calorie goals. Auth sessions hashed at rest, Argon2id, trusted-origin+session CSRF, DB-backed bounded auth throttling. All private endpoints authorize household membership, viewers read-only. Mutations use atomic audit and idempotency records and version conflict409. Production settings fail closed.
+
+Tests: actual PostgreSQL migration roundtrip; login/logout/bad-password/throttle/CSRF/IDOR/role/version races/idempotency; exact Decimal targets and unknown macro; mobile390 and desktop1440 register→household→second member→edit goals→history→edit repeat/slots→reload; outage errors; lint/typecheck/build/OpenAPI drift and W00 regressions. Independent security/nutrition/reviewer before merge.
+
+W01-A completion is a testable slice, not whole W01. W01-B single-use invitation/accept and W01-C private original recipes follow only after A passes. Demo2700/1600 explicit opt-in only. No recipe-network fetch or planner in this slice.

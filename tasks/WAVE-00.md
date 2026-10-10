@@ -2,7 +2,7 @@
 
 - **Owner(s):** architect + backend + frontend + qa
 - **Dependencies:** Brak (pierwsza fala)
-- **Status:** LOCAL GATES PASS; PR #1 final CI/merge pending
+- **Status:** COMPLETE (tests run); PR #1 merged62fe10c after exact-head CI PASS
 
 ## Implementation checklist
 

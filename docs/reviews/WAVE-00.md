@@ -15,3 +15,5 @@ Resolved: P1 CI duplicate server start; P1 dev SW disabled in e2e; P1 Docker mig
 Auth, household isolation, macro arithmetic, inventory concurrency, SSRF adapter, unsafe-canning constraints and saved-plan offline queue remain future wave gates, not passed by baseline tests. No production deploy. CI/merge status recorded in implementation status and test report when complete.
 
 CI follow-up: actual post-job uv cache-lock failure led to direct uvicorn/Next process startup and explicit EXIT cleanup, preserving cache and all test gates; latest-head CI still required.
+
+Final CI correction185425a accepted by independent reviewer. Both final Actions runs38066767207/38066764096 PASS; PR #1 merged62fe10c with exact-head guard, no admin bypass.

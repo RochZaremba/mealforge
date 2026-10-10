@@ -30,7 +30,7 @@
 | make dev (third attempt) | 0 | all3 services healthy; nonroot direct Alembic migration0; real HTTP health/ready/status/proxyready200 |
 | PLAYWRIGHT_NO_SERVER=1 make e2e (Docker + official bundle) | 0 |10tests passed6.4s, official Chrome156.0.8078.4 / Playwright1.64.0 against actual standalone Docker web and API |
 
-One upstream Starlette/TestClient httpx deprecation warning, without failed tests. Actual local browser: system Chromium153.0.8010.52 on Arch, Playwright1.64.0; official browser bundle also installed and tested against Docker; Actions for final Compose-fix head still pending. Screenshots under docs/evidence/wave-00. Independent reviewer approved local gate after their own Docker HTTP smoke. Full product domain A01–A15 remain future-wave acceptance, not completed by shell smoke.
+One upstream Starlette/TestClient httpx deprecation warning, without failed tests. Actual local browser: system Chromium153.0.8010.52 on Arch, Playwright1.64.0; official browser bundle also installed and tested against Docker; Final CI subsequently passed (record below). Screenshots under docs/evidence/wave-00. Independent reviewer approved local gate after their own Docker HTTP smoke. Full product domain A01–A15 remain future-wave acceptance, not completed by shell smoke.
 
 
 Audit nutrition/integrations: istniejące syntetyczne fixtures nie zawierają fikcyjnych wartości nutrient; fetch wszystkich źródeł wyłączony. Przed W01 kontrakt makro wymaga null; przed W02 import contract musi wymusić link-only/draft/provenance.
@@ -39,3 +39,30 @@ Audit nutrition/integrations: istniejące syntetyczne fixtures nie zawierają fi
 Actions38063054961 (f2bbfe6): all validation/test/build/E2E steps successful, overall failure at setup-uv post-cleanup. uv run hosting long-lived API held cache lock; uv cache prune waited300s then failed. Fix: direct installed uvicorn for CI service, direct Next CLI, EXIT trap kills/waits both servers, job budget15minutes. New head CI required before merge; no checks skipped.
 
 Actions38066342121 (9ff35f1): direct API healthy, web failed HTTP readiness because Next CLI ran in monorepo root without app directory. Independently reproduced locally (exit1, missing root .next) and reviewer identified same. Fixed explicit start apps/web directory; local corrected startup on3002 and /status200 confirmed. Server logs attached to CI artifacts for failures. Next exact-head CI still required.
+
+W00 final gate: Actions38066767207 and38066764096 SUCCESS on exact head185425a108c614b4022c07a6860b956900058b88, including post-job cleanup. PR #1 merged62fe10c. W01-A tests not run yet.
+
+## W01-A work in progress
+- `uv run --project apps/api python scripts/test_nutrition_contract.py`: exit0,4 tests (unknown/required fields, true0, exact fractions, invalid/negative/precision, positive energy).
+- `uv run --project apps/api python scripts/validate_kit.py`:149passed0failed0skipped after schema change.
+- `make backup-test`: exit0; consistent exported PG snapshot → encrypted dump → restore → all2 tables/6rows equal. This run is before W01 private tables; private-record proof still pending.
+
+### W01-A integrated API/web checks
+- `make install migrate openapi check-contract`: exit0; frozen locks, dev migration0002 and exact generated OpenAPI.
+- Initial integrated Ruff: exit1 due QA import ordering; QA follow-up df5e968 fixes it, rerun below.
+- `make test migration-test` before new QA races: exit0,56pytest20.95s +integrity1+contract4, real disposable migration roundtrip.
+- After QA race/transport test integration: `make test`: exit0,59pytest25.59s no skips (25 independent QA cases), integrity1 and contract4 PASS.
+- `make lint typecheck build`: exit0; Ruff/eslint, mypy24sourcefiles, tsc, production Next build (11routes).
+- Independent security27 disposable-PG checks PASS; actualUvicorn productioncookie+40peerlimit despite changingXFF+5sbodydeadline PASS; pip-audit no known vulnerabilities after Argon2.
+- Independent reviewer fixes incorporated: immutable UPDATE/DELETE guards; client retry retains key until decoded success; two distinct accounts/sessions race same target/slots with200+409 exactlyone mutation, sameactor2sessions createkey exactlyonce. Actual browser transportfault proof pending.
+
+### W01-A actual Docker/browser/restore feedback loop
+- `make dev`: exit0; nonroot API/Next + PostgreSQL healthy; frozen runtime Argon2 installed, DB migration0002; first download took4m09s, no failure. Real ready200, private session401 unauth, /household200.
+- First `PLAYWRIGHT_NO_SERVER=1 make e2e`: exit2,12passed/2failed9.9s; test helper eagerly read nonexistent logout204body. Fix QA12a36ef preserves status/no-store and removes only irrelevant body-read. Actions38074465454/38074462843 on067c268 failed same helper, all previous gates passed.
+- After fix, full `PLAYWRIGHT_NO_SERVER=1 make e2e`: exit0,14passed9.0s (officialChrome156), mobile390×844/desktop1440×900. Actual register→login→household→secondmember→distinctexactnull/zero goals→history→repeat/slot edits→reload→logout401; real committed POST/truncated JSON retry samekey creates exactlyone member; private cache excluded.
+- Independent QA browser:4passed7.1s systemChromium153, own/tmp evidence/log; screenshots viewed and nooverflow/JSerrors. Root also viewed both complete household screenshots.
+- After securityepoch/keyguard, root `make lint typecheck build`: exit0 again.
+- `make backup-test`: exit0, real encrypted/authenticated dump with exported snapshot; disposable restore all11tables/224rows equal, including actual synthetic private target/history/session/audit/idempotency rows. Temp plaintext/backup/database removed.
+- Security actual duplicate bound-email probe found PG DETAIL privacy leak (P2). Compose PostgreSQL terse/panic/0 settings fixed; own security repeat confirms sentinel absent. `make privacy-test`: exit0, genuine UNIQUE error logged and private bound sentinel absent; no private payload print. CI adds same dedicated service probe.
+
+Final exact-head CI after helper/privacy fix still pending; wholeW01 remains incomplete (B/C).

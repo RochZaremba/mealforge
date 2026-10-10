@@ -6,7 +6,7 @@ Python 3.12, FastAPI/Pydantic 2, SQLAlchemy, psycopg, Alembic. From repository r
 uv sync --project apps/api --frozen
 uv run --project apps/api --env-file .env alembic -c apps/api/alembic.ini upgrade head
 uv run --project apps/api --env-file .env python -m mealforge.seed
-uv run --project apps/api --env-file .env uvicorn mealforge.main:app --host 127.0.0.1 --port 8000 --no-access-log
+uv run --project apps/api --env-file .env uvicorn mealforge.main:app --host 127.0.0.1 --port 8000 --no-access-log --no-proxy-headers
 uv run --project apps/api --env-file .env pytest apps/api/tests
 uv run --project apps/api ruff check apps/api
 uv run --project apps/api mypy --config-file apps/api/pyproject.toml apps/api/src
@@ -23,6 +23,30 @@ Interactive API documentation is disabled; OpenAPI is generated offline from cod
 Integration tests create and drop randomly named disposable PostgreSQL databases.
 `TEST_DATABASE_URL` overrides the development `DATABASE_URL`; the test user needs
 `CREATEDB`. Without either variable these integration tests are explicitly skipped.
-The reference seed contains only five global Polish meal names; there are no
-private households or invented nutrition values. Household and authentication
-features belong to WAVE-01, and are not implemented by this baseline.
+The reference seed contains only five global Polish meal names; it never creates
+accounts, private households, diet targets or invented nutrition values.
+
+W01-A adds `/api/v1/auth` register/login/session/logout and authorized household,
+member, target-history and meal-slot configuration endpoints. Registration requires
+an explicit login. Set `SESSION_SECRET` (at least 32 characters), `APP_ENV` and
+comma-separated `TRUSTED_ORIGINS` (development default `http://localhost:3000`).
+Production requires HTTPS origins, strong non-placeholder session and database
+credentials, and secure cookies. `SESSION_TTL_SECONDS` defaults to seven days.
+Never enable proxy headers from arbitrary clients: auth rate limits use the direct
+peer, which is shared when Next.js proxies requests; email buckets apply separately.
+
+Unsafe requests require trusted `Origin` and JSON; private mutations additionally
+require `X-CSRF-Token` from session GET and UUID `Idempotency-Key` (logout only needs
+CSRF). Actual request bytes are capped at 16 KiB with a five-second upload timeout.
+Password length is 12–128 characters; Argon2id work is bounded to two concurrent
+hashes. Rate buckets are HMAC identifiers in PostgreSQL, counting failed attempts.
+
+Targets accept canonical decimal strings or integers, rejecting float/bool input.
+All four values must be supplied explicitly; unknown is `null`, genuine zero macro
+is retained. Profiles append immutable history with optimistic versions, and warn
+only when fully known `4P + 4C + 9F` differs from kcal by more than 5%. Targets have
+current/past effective dates in this slice; future scheduling is rejected explicitly.
+Slots are an atomic set of 1–12 rows, initially five; breakfast/dinner repetition is
+a persisted preference, applied by the future planner. Invitations, recipe editing,
+nutrition calculations, weekly plans and offline private data are not implemented
+in W01-A.

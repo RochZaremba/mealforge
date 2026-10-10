@@ -1,4 +1,4 @@
-.PHONY: help init-env validate-kit deps install dev dev-local stop test lint typecheck e2e migrate seed migration-test openapi check-contract build backup backup-test
+.PHONY: help init-env validate-kit deps install dev dev-local stop test lint typecheck e2e migrate seed migration-test openapi check-contract build backup backup-test privacy-test
 UV ?= uv
 PNPM ?= pnpm
 COMPOSE = docker compose --env-file .env -f compose.dev.yml
@@ -30,6 +30,7 @@ check-contract:
 test:
 	$(UV) run --directory apps/api --env-file ../../.env pytest
 	python3 scripts/test_backup_integrity.py
+	$(UV) run --directory apps/api python ../../scripts/test_nutrition_contract.py
 lint:
 	$(UV) run --directory apps/api ruff check .
 	$(PNPM) lint
@@ -46,3 +47,6 @@ backup-test:
 	$(UV) run --project apps/api --env-file .env python scripts/test_backup_restore.py
 backup:
 	python3 scripts/backup.py
+
+privacy-test:
+	$(UV) run --project apps/api --env-file .env python scripts/test_database_log_privacy.py
