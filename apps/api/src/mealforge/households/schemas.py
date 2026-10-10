@@ -179,6 +179,7 @@ class HouseholdResponse(BaseModel):
     timezone: str
     currency: str
     role: str
+    capabilities: dict[str, bool]
 
 
 class HouseholdsResponse(BaseModel):
@@ -215,6 +216,8 @@ class MemberResponse(BaseModel):
     user_id: str | None
     nutrition_target: TargetResponse | None
     version: int
+    access_enabled: bool
+    access_version: int
 
 
 class MembersResponse(BaseModel):

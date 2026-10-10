@@ -2,22 +2,22 @@
 
 - **Owner(s):** backend + frontend + qa
 - **Dependencies:** WAVE-00
-- **Status:** IN PROGRESS — slice A; invitations/original catalogue remain B/C
+- **Status:** IN PROGRESS — A merged (PR #2); invitations B local gates passed (PR #3 final CI/merge gate), original catalogue C remains
 
 ## Implementation checklist
 
-- [ ] Build password/session authentication, household membership and guest profile (no login for guest).
+- [x] Build password/session authentication, household membership and guest profile (no login for guest); A merged, B local83API/16E2E gate passed.
 - [ ] Implement 2 sample members only as seeded demo data (2700 and 1600 kcal), all targets editable (kcal B W T), history versions.
-- [ ] Create 5 editable daily slot presets, repeat breakfast/dinner controls, Polish onboarding, mobile/desktop dashboard.
+- [x] Create 5 editable daily slot presets, repeat breakfast/dinner controls, Polish onboarding, mobile/desktop dashboard (A, real PostgreSQL and 390/1440 E2E).
 - [ ] Create first ORIGINAL recipe fixtures/seed with real amounts and user-editable instructions; incomplete nutrient data visible as unknown.
-- [ ] Household IDOR tests and profile warnings for kcal-macro inconsistency.
+- [x] Household IDOR tests and profile warnings for kcal-macro inconsistency (A; exact Decimal and strict 5% boundary).
 
 ## Acceptance gates
 
-- [ ] Two users with separate household records cannot read each other by guessing id.
+- [x] Two users with separate household records cannot read each other by guessing id (A API/QA tests).
 - [ ] Changing profile goals updates preview, retains history.
-- [ ] 5 slots/day render on 390px and 1440px.
-- [ ] Repeat breakfast/dinner option visibly functional, not static toggle.
+- [x] 5 slots/day render on 390px and 1440px (A screenshots and E2E).
+- [x] Repeat breakfast/dinner option visibly functional, not static toggle (A persisted preferences; planner reuse remains W03).
 
 ## Evidence and integration
 

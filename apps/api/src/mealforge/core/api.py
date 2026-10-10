@@ -21,7 +21,7 @@ PROBLEM_RESPONSES: dict[int | str, dict[str, Any]] = {
         "description": "Żądanie odrzucone lub usługa niedostępna.",
         "content": {"application/problem+json": {"schema": Problem.model_json_schema()}},
     }
-    for status in (401, 403, 404, 409, 413, 415, 422, 429, 503)
+    for status in (401, 403, 404, 409, 410, 413, 415, 422, 429, 503)
 }
 
 

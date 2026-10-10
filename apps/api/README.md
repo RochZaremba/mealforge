@@ -47,6 +47,20 @@ is retained. Profiles append immutable history with optimistic versions, and war
 only when fully known `4P + 4C + 9F` differs from kcal by more than 5%. Targets have
 current/past effective dates in this slice; future scheduling is rejected explicitly.
 Slots are an atomic set of 1–12 rows, initially five; breakfast/dinner repetition is
-a persisted preference, applied by the future planner. Invitations, recipe editing,
-nutrition calculations, weekly plans and offline private data are not implemented
-in W01-A.
+a persisted preference, applied by the future planner. Recipe editing, nutrition
+calculations, weekly plans and offline private data remain later slices.
+
+W01-B adds owner-only 24-hour invitations and access administration. Codes are
+64-character hex tokens returned only in create responses, submitted in JSON to
+authenticated accept; they are never emailed, embedded in URLs, logged, or stored
+in audit/idempotency JSON. A private random nonce and domain-separated HMAC derive
+the token, with only its SHA256 hash used for lookup. Changing the session secret
+invalidates pending codes and create replays explicitly. Household locks serialize
+authorization, access changes, acceptance and revocation before invitation/member
+locks; accepted codes cannot be consumed twice. Acceptance preserves an existing
+non-guest resident profile and all immutable targets. Access revocation preserves
+resident participation (`active`) while disabling account access (`access_enabled`).
+Owners cannot revoke or demote themselves; owner identity is verified through
+`owner_user_id`. Role/access changes have their own `access_version`, separate from
+target history. Household DTOs expose current `can_edit`/`can_manage_access`
+capabilities; private reads, writes, lists and retries all recheck current access.

@@ -1,6 +1,6 @@
 # MealForge — zestaw startowy repozytorium dla Codexa
 
-> Stan: **WAVE-00 lokalnie zweryfikowana**. API/DB/web baseline powstaje jako pierwszy etap. Planowanie, nutrition, households i kuchnia wymagają WAVE-01–07; aplikacja nie jest jeszcze gotowym produktem.
+> Stan: **WAVE-00 i WAVE-01-A scalone po testach i review**. Działają API/DB/web, logowanie, prywatne gospodarstwa, cele i historia domowników oraz ustawienia posiłków. Zaproszenia W01-B przechodzą końcowe testy w PR #3. Katalog przepisów, obliczenia żywieniowe, planowanie i kuchnia pozostają kolejnymi etapami; aplikacja nie jest jeszcze gotowym produktem.
 
 **Cel:** self-hosted PWA do planowania jedzenia dla dwóch osób (i gości), z osobnymi kaloriami i makro, wspólnym gotowaniem, meal prepem w słoikach/pojemnikach, magazynem, wydarzeniami i automatycznymi zakupami.
 
@@ -10,6 +10,7 @@
 make init-env
 make dev
 # http://localhost:3000/status
+# http://localhost:3000/household — rejestracja i prywatne gospodarstwo
 ```
 
 Docker Compose buduje realny API/web i migruje PostgreSQL. Dla lokalnego developmentu i quality gates: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Faktyczny zakres i testy: [status](docs/IMPLEMENTATION_STATUS.md), [test report](docs/TEST_REPORT.md).

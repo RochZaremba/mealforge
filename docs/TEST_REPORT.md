@@ -65,4 +65,36 @@ W00 final gate: Actions38066767207 and38066764096 SUCCESS on exact head185425a10
 - `make backup-test`: exit0, real encrypted/authenticated dump with exported snapshot; disposable restore all11tables/224rows equal, including actual synthetic private target/history/session/audit/idempotency rows. Temp plaintext/backup/database removed.
 - Security actual duplicate bound-email probe found PG DETAIL privacy leak (P2). Compose PostgreSQL terse/panic/0 settings fixed; own security repeat confirms sentinel absent. `make privacy-test`: exit0, genuine UNIQUE error logged and private bound sentinel absent; no private payload print. CI adds same dedicated service probe.
 
-Final exact-head CI after helper/privacy fix still pending; wholeW01 remains incomplete (B/C).
+Final exact-head4eaf30c CI PASS: Actions38075073982+38075070579, including PostgreSQL privacy probe and14E2E. PR2 mergedd544a88. WholeW01 remains incomplete (B/C); B tests not run yet.
+
+## W01-B integrated gate (in progress)
+
+- `make migrate openapi check-contract`: exit0; real development migration0003 and generated OpenAPI match.
+- `make test migration-test` before independent B QA integration: exit0;65pytest27.46s, no skips (59A+6B), integrity1 and target-contract4 PASS; disposable migration up/check/seed/down/up/check/schema equality PASS.
+- Integrated web `pnpm lint && pnpm build && pnpm typecheck`: exit0;11routes; before final fingerprint-only retry fix. Final source needs browser/regression gate.
+- Integrated API Ruff/mypy: exit0;27sourcefiles.
+- Independent security:51actual disposable-PG checks PASS; expiry, rotation, reference-only idempotency, owner protection, revoked reads/list/replay, unchanged profiles. Client hashing/retry/auth-generation regression probes PASS.
+- Independent nutrition:27actual disposable-PG preservation assertions PASS across accept/viewer/revoke/restore/guest denial. Exact targets, nulls, zero, member/profile IDs and history unchanged.
+- Feedback loop: unsupported Pydantic Rust-regex lookahead prevented first independent test collection (exit2); backend replaced regex before integration. First combined agent run75/80 passed;5QA expectations corrected to assert both intentional metadata-only audit actions once each, and409canonical-owner protection. Corrected full test run pending; no failing invariant suppressed.
+- Deterministic distinct-session concurrency, actual Docker/two-account mobile+desktop browser, restore, final reviews and exact-head CI remain pending. PR #3 is draft; B is not complete.
+
+### W01-B full API / actual Docker gates
+- `make test` after QAaf88b32 integration: exit0,80pytest40.95s, no skips; integrity1 and target-contract4 PASS. Fifteen independent B security tests include a real PostgreSQL row-lock barrier: two recipient requests complete lookup before unlock, then exactly one links a new resident (200/409).
+- `make lint typecheck`: exit0 after final fingerprint-only client fix; Ruff/eslint/mypy27files/tsc PASS.
+- `make dev`: exit0; nonroot actual API/Next/PostgreSQL healthy, migration0003 complete, Docker production build11routes. Public ready200 and unauthenticated private API401/no-store through the real proxy.
+- `make backup-test privacy-test`: exit0;12tables/353rows consistent encrypted restore equal; actual UNIQUE error present without private bound sentinel. Invitation table exists; full live two-account invitation records and browser evidence still pending.
+
+### W01-B browser feedback loop (gate remains open)
+- Existing14A/W00browser regressions: `PLAYWRIGHT_NO_SERVER=1 make e2e` exit0,14passed9.8s against actual B Docker and final client fingerprint code.
+- Intermediatebf0e3d8 CI Actions38076686593/38076684209 SUCCESS (80API +14oldE2E); new B browser cases were not yet integrated, so this is not the final B gate.
+- First independent B two-account browser run: exit1,2failed at120s timeout selecting invitation member on both viewports. Actual DOM had repeated invitation sections/duplicate IDs. Root identified identical React sibling keys on InvitationManager and MealPresets; frontend fix and browser recheck pending. Tests will require exactly one invitation form rather than selecting the first duplicate. No raw codes are retained in browser traces/screenshots.
+
+- Fixed source2a57017 actual `make dev` rerun: exit0; three distinct sibling-key namespaces and Docker production build11routes. `make validate-kit check-contract lint typecheck`: exit0;151kit checks, no failures/skips, OpenAPI exact, Ruff/eslint/mypy27/tsc PASS.
+- Root `make test` afterd667a3a forced-interleaving tests: exit0,83pytest80.23s, no skips; integrity1 and target-contract4 PASS. Independent owned B security suite18passed27.58s.
+- Second independent B browser run still failed2cases: DOM now has exactly one invitation form (source fix effective); exact getByLabel on a nested select includes option text. QA switching to accessible combobox names and shorter deadlines. Native secret entry successfully reached authenticated target version2; prior logs/error-context contain no64hex codes (boolean-only scans).
+
+### W01-B final local gate
+- New B QA `39428db` + screenshot-only `010b38c` integrated asf019092/5784c46. Independent2browserflows PASS9.0s, then8.9s after screenshot normalization; no overflow/JS errors. Traces absent, code-shaped strings absent from logs/context; six synthetic sanitized PNGs copied to docs/evidence/wave-01-b and reviewed.
+- Root `PLAYWRIGHT_NO_SERVER=1 make e2e`: exit0,16passed17.2s official bundled Chrome, actual Docker; includes all14A/W00regressions and2B two-account lifecycle cases.
+- After actual B browser writes, `make backup-test`: exit0,12tables554rows exact; snapshot includes2actual invitation records plus42profiles/112audit/110idempotency rows. Counts only; no private values printed.
+- Final local source review: docs/reviews/WAVE-01-B.md. Exact final-head CI remains merge gate; priorbf0 CI did not include new B browser cases.

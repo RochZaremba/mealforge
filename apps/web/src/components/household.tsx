@@ -15,6 +15,12 @@ import {
   type Target,
 } from "@/lib/api";
 import { useSession } from "./session-provider";
+import {
+  InvitationAccept,
+  InvitationManager,
+  MemberAccess,
+  type InvitationAccepted,
+} from "./invitations";
 
 function Feedback({ error, success }: { error?: string; success?: string }) {
   return (
@@ -193,11 +199,13 @@ function MemberCard({
   household,
   session,
   onSaved,
+  onAccessSaved,
 }: {
   member: Member;
   household: Household;
   session: Session;
   onSaved: (target: Target) => void;
+  onAccessSaved: (member: Member) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [history, setHistory] = useState<Target[] | null>(null);
@@ -216,7 +224,7 @@ function MemberCard({
     valid_from: target?.valid_from ?? todayForHousehold(household.timezone),
   });
   const base = `households/${household.id}/members/${member.id}/nutrition-target`;
-  const canEdit = ["owner", "editor"].includes(household.role);
+  const canEdit = household.capabilities.can_edit;
   async function save(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
@@ -381,6 +389,12 @@ function MemberCard({
           </fieldset>
         </form>
       )}
+      <MemberAccess
+        member={member}
+        household={household}
+        session={session}
+        onSaved={onAccessSaved}
+      />
       {history && (
         <div className="history-list" data-testid="target-history">
           <h4>Historia celów</h4>
@@ -418,7 +432,7 @@ function SlotEditor({
   const [success, setSuccess] = useState("");
   const [dirty, setDirty] = useState(false);
   const [conflict, setConflict] = useState(false);
-  const canEdit = ["owner", "editor"].includes(household.role);
+  const canEdit = household.capabilities.can_edit;
   function change(index: number, patch: Partial<MealSlot>) {
     setSlots((current) =>
       current.map((slot, i) => (i === index ? { ...slot, ...patch } : slot)),
@@ -465,6 +479,30 @@ function SlotEditor({
       setBusy(false);
     }
   }
+  if (!canEdit)
+    return (
+      <section className="form-card" data-testid="meal-slots">
+        <h2>Posiłki w ciągu dnia</h2>
+        <p className="section-description">
+          Zapisane ustawienia · wersja {version}. Masz dostęp do podglądu.
+        </p>
+        <ol className="readonly-slots">
+          {slots.map((slot, index) => (
+            <li key={slot.id ?? index}>
+              <h3>{slot.name}</h3>
+              <p className="note">
+                Godzina: {slot.default_time?.slice(0, 5) ?? "Nieznana"} · udział
+                energii: {slot.default_share ?? "Nieznany"}
+              </p>
+              <p className="note">
+                Powtarzanie co tydzień:{" "}
+                {slot.repeat_weekly ? "włączone" : "wyłączone"}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
+    );
   return (
     <section className="form-card">
       <h2>Posiłki w ciągu dnia</h2>
@@ -732,6 +770,42 @@ function AuthenticatedHousehold() {
       setBusy(false);
     }
   }
+  async function joinHousehold(result: InvitationAccepted) {
+    const generation = currentAuthGeneration();
+    let confirmedSession: Session;
+    try {
+      confirmedSession = await api<Session>("auth/session");
+    } catch (problem) {
+      if (
+        problem instanceof ApiError &&
+        problem.status === 401 &&
+        generation === currentAuthGeneration()
+      )
+        setSession(null);
+      throw problem;
+    }
+    const confirmedHouseholds = await api<{ households: Household[] }>(
+      "households",
+    );
+    if (generation !== currentAuthGeneration()) return;
+    const joined = confirmedHouseholds.households.find(
+      (item) => item.id === result.household.id,
+    );
+    if (!joined)
+      throw new ApiError(
+        404,
+        "HOUSEHOLD_NOT_FOUND",
+        "Nie można potwierdzić dostępu do gospodarstwa. Odśwież listę gospodarstw.",
+      );
+    setSession(confirmedSession);
+    setHouseholds(confirmedHouseholds.households);
+    setSelected(joined.id);
+    setMembers([]);
+    setPresets(null);
+    setReload((value) => value + 1);
+    setError("");
+    setSuccess("Zaproszenie przyjęte. Dołączono do gospodarstwa.");
+  }
   const household = households.find((h) => h.id === selected);
   if (loading)
     return (
@@ -770,6 +844,11 @@ function AuthenticatedHousehold() {
         </button>
       </section>
       <Feedback error={error} success={success} />
+      <InvitationAccept
+        key={selected || "no-household"}
+        session={session}
+        onAccepted={joinHousehold}
+      />
       {dataLoading && <p role="status">Pobieranie gospodarstwa…</p>}
       {households.length === 0 && !dataLoading ? (
         <section className="form-card">
@@ -845,10 +924,17 @@ function AuthenticatedHousehold() {
           {household &&
             members.map((member) => (
               <MemberCard
-                key={`${member.id}-${reload}`}
+                key={`member-${member.id}-${reload}`}
                 member={member}
                 household={household}
                 session={session}
+                onAccessSaved={(saved) =>
+                  setMembers((current) =>
+                    current.map((member) =>
+                      member.id === saved.id ? saved : member,
+                    ),
+                  )
+                }
                 onSaved={(target) =>
                   setMembers((current) =>
                     current.map((m) =>
@@ -864,12 +950,20 @@ function AuthenticatedHousehold() {
                 }
               />
             ))}
-          {household && ["owner", "editor"].includes(household.role) && (
+          {household && presets && household.capabilities.can_manage_access && (
+            <InvitationManager
+              key={`invite-${household.id}-${reload}`}
+              household={household}
+              members={members}
+              session={session}
+            />
+          )}
+          {household && household.capabilities.can_edit && (
             <section className="form-card">
               <h2>Dodaj domownika</h2>
               <p className="section-description">
-                Osobne cele bez osobnego logowania. Zaproszenia do kont pojawią
-                się w kolejnym etapie.
+                Osobne cele bez osobnego logowania. Właściciel może potem
+                połączyć ten profil z kontem przez zaproszenie.
               </p>
               <form onSubmit={addMember}>
                 <fieldset disabled={busy}>
@@ -892,7 +986,7 @@ function AuthenticatedHousehold() {
           )}
           {household && presets && (
             <SlotEditor
-              key={`${household.id}-${reload}`}
+              key={`slots-${household.id}-${reload}`}
               initial={presets}
               household={household}
               session={session}
@@ -901,8 +995,8 @@ function AuthenticatedHousehold() {
         </>
       )}
       <p className="note">
-        Planowanie dań, alergie i zaproszenia nie są jeszcze dostępne w tym
-        etapie. Nie używaj ustawień posiłków jako gotowego planu diety.
+        Planowanie dań i alergie nie są jeszcze dostępne w tym etapie. Nie
+        używaj ustawień posiłków jako gotowego planu diety.
       </p>
     </div>
   );

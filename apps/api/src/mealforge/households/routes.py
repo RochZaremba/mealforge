@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mealforge.core.api import PROBLEM_RESPONSES, ApiError, Configuration, Db, audit, mutate, now
+from mealforge.households.authorization import authorize, capabilities
 from mealforge.households.models import Household, HouseholdMember, MealSlotPreset, NutritionProfile
 from mealforge.households.schemas import (
     HistoryResponse,
@@ -22,37 +23,20 @@ from mealforge.households.schemas import (
     TargetInput,
     TargetResponse,
 )
-from mealforge.identity.routes import Auth, Authenticated, require_mutation
+from mealforge.identity.routes import Auth, require_mutation
 from mealforge.seed import MEAL_SLOT_DEFINITIONS
 
 router = APIRouter(prefix="/api/v1/households", tags=["households"], responses=PROBLEM_RESPONSES)
 
 
-def authorize(
-    db: Session, auth: Authenticated, household_id: UUID, *, write: bool = False
-) -> HouseholdMember:
-    member = db.scalar(
-        select(HouseholdMember).where(
-            HouseholdMember.household_id == household_id,
-            HouseholdMember.user_id == auth.user.id,
-            HouseholdMember.active.is_(True),
-            HouseholdMember.is_guest.is_(False),
-        )
-    )
-    if member is None:
-        raise ApiError(404, "RESOURCE_NOT_FOUND", "Nie znaleziono zasobu.")
-    if write and member.role not in {"owner", "editor"}:
-        raise ApiError(403, "EDIT_FORBIDDEN", "Nie masz uprawnień do zmiany danych.")
-    return member
-
-
-def household_dto(household: Household, role: str) -> dict[str, Any]:
+def household_dto(household: Household, member: HouseholdMember) -> dict[str, Any]:
     return {
         "id": str(household.id),
         "name": household.name,
         "timezone": household.timezone,
         "currency": household.currency,
-        "role": role,
+        "role": member.role,
+        "capabilities": capabilities(household, member),
     }
 
 
@@ -114,6 +98,8 @@ def member_dto(db: Session, member: HouseholdMember) -> dict[str, Any]:
         "user_id": str(member.user_id) if member.user_id else None,
         "nutrition_target": target_dto(latest) if latest else None,
         "version": member.target_revision,
+        "access_enabled": member.access_enabled,
+        "access_version": member.access_version,
     }
 
 
@@ -156,16 +142,27 @@ def slots_dto(db: Session, household: Household) -> dict[str, Any]:
 @router.get("", response_model=HouseholdsResponse)
 def list_households(db: Db, auth: Auth) -> dict[str, Any]:
     rows = db.execute(
-        select(Household, HouseholdMember.role)
+        select(Household, HouseholdMember)
         .join(HouseholdMember, HouseholdMember.household_id == Household.id)
         .where(
             HouseholdMember.user_id == auth.user.id,
             HouseholdMember.active.is_(True),
+            HouseholdMember.access_enabled.is_(True),
             HouseholdMember.is_guest.is_(False),
         )
         .order_by(Household.created_at)
     ).all()
-    return {"households": [household_dto(household, role) for household, role in rows]}
+    # Recheck under the same per-household lock as revocation, including list results.
+    result = []
+    for household, _ in sorted(rows, key=lambda row: str(row[0].id)):
+        try:
+            membership = authorize(db, auth, household.id)
+        except ApiError as error:
+            if error.status == 404:
+                continue
+            raise
+        result.append(household_dto(household, membership))
+    return {"households": result}
 
 
 @router.post("", status_code=201, response_model=HouseholdResponse)
@@ -195,6 +192,7 @@ def create_household(
             target_revision=0,
         )
         db.add(member)
+        db.flush()
         for ordering, (code, name) in enumerate(MEAL_SLOT_DEFINITIONS):
             db.add(
                 MealSlotPreset(
@@ -210,11 +208,14 @@ def create_household(
         audit(
             db, request, auth.user.id, household.id, "household.created", "household", household.id
         )
-        return household_dto(household, "owner")
+        return household_dto(household, member)
 
     def replay_authorize(result: dict[str, Any]) -> None:
         membership = authorize(db, auth, UUID(result["id"]), write=True)
         result["role"] = membership.role
+        household = db.get(Household, UUID(result["id"]))
+        assert household is not None
+        result["capabilities"] = capabilities(household, membership)
 
     return mutate(
         db,
@@ -233,7 +234,7 @@ def get_household(household_id: UUID, db: Db, auth: Auth) -> dict[str, Any]:
     member = authorize(db, auth, household_id)
     household = db.get(Household, household_id)
     assert household is not None
-    return household_dto(household, member.role)
+    return household_dto(household, member)
 
 
 @router.get("/{household_id}/members", response_model=MembersResponse)

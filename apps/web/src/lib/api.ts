@@ -15,6 +15,7 @@ export type Household = {
   timezone: string;
   currency: string;
   role: string;
+  capabilities: { can_edit: boolean; can_manage_access: boolean };
 };
 export type Target = {
   id: string;
@@ -36,6 +37,8 @@ export type Member = {
   user_id: string | null;
   nutrition_target: Target | null;
   version: number;
+  access_enabled: boolean;
+  access_version: number;
 };
 export type MealSlot = {
   id: string | null;
@@ -67,7 +70,23 @@ export async function api<T>(
   const method = options.method ?? "GET";
   const serialized =
     options.body === undefined ? undefined : JSON.stringify(options.body);
-  const action = `${options.session?.user.id ?? "anonymous"}:${method}:${path}:${serialized}`;
+  let fingerprint = serialized ?? "";
+  if (options.session && method !== "GET") {
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(fingerprint),
+    );
+    fingerprint = Array.from(new Uint8Array(digest), (byte) =>
+      byte.toString(16).padStart(2, "0"),
+    ).join("");
+    if (generation !== authGeneration)
+      throw new ApiError(
+        401,
+        "SESSION_CHANGED",
+        "Sesja zmieniła się. Sprawdź zalogowane konto przed ponownym zapisem.",
+      );
+  }
+  const action = `${options.session?.user.id ?? "anonymous"}:${method}:${path}:${fingerprint}`;
   const headers = new Headers();
   let mutationKey: string | undefined;
   const confirmOperation = () => {
