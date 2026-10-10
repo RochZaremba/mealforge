@@ -1,4 +1,4 @@
-# Test report — 2026-10-10
+# Test report — 2026-10-11
 
 | Wave | Command | Exit | Actual result |
 |---|---|---|---|
@@ -130,3 +130,12 @@ W01-B final exact-headd650dd006ea62701ff2ef1bd4cd0b6442401c365 CI PASS: Actions3
 - Independent reviewer LOCAL integration PASSc880c5b after viewing mobile detail/pagination and desktop detail/viewer; production source70127bf unchanged by harness fix. Lead accepts the local gate. Final documented-head Actions including cleanup remain required before merge.
 
 W01-C final gate: exact13c1c834b5d3ea1484830fe1aa8af9fb08382d2f Actions38091280517+38091277922 SUCCESS, including120API/24E2E and cleanup. PR4 mergedc3f58ee7721595a21318b7ca71437ec1c91fd13f at2026-10-10T22:28:11Z (2026-10-11 Europe/Warsaw). WholeW01 COMPLETE. W02 has no runtime implementation yet; after main pull `make validate-kit`: exit0,154passed/0failed/0skipped before new contracts.
+
+## W02-A integrated gate (in progress)
+
+- `uv sync --directory apps/api --frozen; make validate-kit openapi`: exit0;156kit checks/no skips, generated actual OpenAPI includes link routes/strict DTOs.
+- `make lint typecheck check-contract build`: exit0; Ruff/eslint, mypy42files, tsc, exact schema drift and Next production11routes PASS. Owned new browser lint/typecheck also PASS.
+- `uv run --directory apps/api python ../../scripts/check_recipe_sources.py`: exit0; installed registry equals root and audited loader. Additional actual script probes reject modified package, changed loader and enabled-fetch configuration without exposing data.
+- `make dev`: exit0;3healthy Docker services, actual migration0005. `make source-registry-test recipe-fixture-test`: exit0; actual container registry and original recipes equal installed/root resources, all external fetch remains disabled.
+- Backend isolated full regression245tests PASS123.45s; this run collected older27QA cases. Latest independentQA29tests separately PASS29.46s. Root combined247tests/migration round-trip currently running; no success claimed yet.
+- Independent source/security/nutrition/integrations checks in `docs/reviews/WAVE-02-A.md`; root real28mobile/desktop browser cases, populated15-table restore/privacy and exact-head CI still pending. No production deployment; parser/nutrition/provider functionality not implemented in A.

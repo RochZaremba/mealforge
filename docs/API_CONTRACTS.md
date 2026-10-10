@@ -133,3 +133,19 @@ RecipeSummary contains `id`, `household_id`, `version`, `title`, `created_at`, `
 Server-owned provenance distinguishes `original_fixture` text by MealForge (`CC0-1.0`, scope `original_recipe_text`) from `private_user_content` (private use, license unknown). Editing a demo recipe retains original attribution in `original_origin` and the previous immutable `source_version_id`; the new contribution does not automatically inherit CC0. User confirmation concerns their own contribution. License, origin, nutrient, safety and planner fields cannot be injected through RecipeInput.
 
 Demo requires the audited runtime fixture and creates two resident profiles (2700/1600 kcal, every macro null), five meal slots and three draft recipes in the same transaction. Missing or changed fixture aborts with 503, without partial household creation. Household DTO adds `source: user_created|demo_seed`; target DTO adds `source: user_set|demo_seed` and demo warnings. Legacy stored responses default only to their known pre-demo source semantics, preserving idempotent replay compatibility.
+
+## W02-A link-only contract (integrated; acceptance gates in progress)
+
+Authenticated household routes retain current authorization, private `no-store` responses and existing 16 KiB request bounds. POST requires editor/owner, trusted Origin, JSON, CSRF and UUID Idempotency-Key. Viewer may read; revoked access cannot read or replay a write.
+
+| Method | Path | Input / result |
+|---|---|---|
+| GET | `/households/{id}/recipe-links` | `limit` 1–20 (default 20), optional UUID `after`; `{recipe_links: RecipeLinkSummary[], next_cursor: UUID\|null}`, ascending UUID order. |
+| POST | `/households/{id}/recipe-links` | LinkInput; 201 RecipeLinkDetail. A new key for the same canonical URL returns 409 `RECIPE_LINK_EXISTS`; retry with the original key returns the committed link after current authorization. |
+| GET | `/households/{id}/recipe-links/{link_id}` | RecipeLinkDetail; foreign resources hidden with 404. |
+
+LinkInput: `user_title` (1–160 characters), `source_url` (strict HTTPS URL, up to 2048 encoded UTF-8 bytes both before and after validation), optional nullable `own_note` (up to 2000 characters), and `own_contribution_attestation: "i_am_author_of_label_and_note"`. Extra fields are forbidden. The declaration covers only the user's label/note. Protected source text, images, nutrition and safety fields are not imported.
+
+Summary: `id`, `household_id`, `user_title`, `source_url`, `host`, nullable `source_id`, `source_registry_checked_at`, `created_at`, `version: 1`, `status: "link_only"`, `planner_eligible: false`, `license: null`, `automatic_fetch_enabled: false`, `nutrition_status: "unknown"`, `allergen_status: "unknown"`. Detail additionally contains `canonical_url`, `own_note`, `own_contribution_attestation` and `actor_user_id`. Summaries omit notes. Registry date is the packaged configuration's historical check date; recognition of a domain grants no rights or network permission.
+
+Opening URL preserves fragments, query order and encoded separators. Canonical URL removes only the fragment for deduplication after safe scheme/host/default-port normalization. Unsafe numeric/local hosts, credentials, non-443 ports, raw whitespace/control/backslashes, encoded controls, malformed percent encoding, domain-changing IDNA mappings and browser dot segments are rejected. Validation performs neither DNS nor HTTP; a syntactically allowed domain is not evidence of public resolution or permission for future fetching. No edit/delete/import endpoints exist in A. Missing or changed packaged registry aborts creation atomically with 503 `SOURCE_REGISTRY_UNAVAILABLE`.
