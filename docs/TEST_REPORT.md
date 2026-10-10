@@ -77,3 +77,9 @@ Final exact-head4eaf30c CI PASS: Actions38075073982+38075070579, including Postg
 - Independent nutrition:27actual disposable-PG preservation assertions PASS across accept/viewer/revoke/restore/guest denial. Exact targets, nulls, zero, member/profile IDs and history unchanged.
 - Feedback loop: unsupported Pydantic Rust-regex lookahead prevented first independent test collection (exit2); backend replaced regex before integration. First combined agent run75/80 passed;5QA expectations corrected to assert both intentional metadata-only audit actions once each, and409canonical-owner protection. Corrected full test run pending; no failing invariant suppressed.
 - Deterministic distinct-session concurrency, actual Docker/two-account mobile+desktop browser, restore, final reviews and exact-head CI remain pending. PR #3 is draft; B is not complete.
+
+### W01-B full API / actual Docker gates
+- `make test` after QAaf88b32 integration: exit0,80pytest40.95s, no skips; integrity1 and target-contract4 PASS. Fifteen independent B security tests include a real PostgreSQL row-lock barrier: two recipient requests complete lookup before unlock, then exactly one links a new resident (200/409).
+- `make lint typecheck`: exit0 after final fingerprint-only client fix; Ruff/eslint/mypy27files/tsc PASS.
+- `make dev`: exit0; nonroot actual API/Next/PostgreSQL healthy, migration0003 complete, Docker production build11routes. Public ready200 and unauthenticated private API401/no-store through the real proxy.
+- `make backup-test privacy-test`: exit0;12tables/353rows consistent encrypted restore equal; actual UNIQUE error present without private bound sentinel. Invitation table exists; full live two-account invitation records and browser evidence still pending.
