@@ -16,7 +16,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
-from sqlalchemy import Engine, func, select, text
+from sqlalchemy import Engine, func, select, text, update
 from sqlalchemy.orm import Session
 
 from mealforge.core.config import Settings
@@ -660,3 +660,163 @@ def test_both_recipients_peek_before_household_unlock_cannot_consume_new_residen
         invitation = session.get(HouseholdInvitation, UUID(created["id"]))
         assert invitation is not None and invitation.version == 2
         assert str(invitation.accepted_by_user_id) == recipients[statuses.index(200)].user_id
+
+
+def wait_for_household_lock(engine: Engine) -> None:
+    """Observe a real waiter after its earlier unprotected ORM read has completed."""
+    deadline = monotonic() + 4
+    waiting = 0
+    while monotonic() < deadline:
+        with engine.connect() as observer:
+            waiting = observer.scalar(
+                text(
+                    "SELECT count(*) FROM pg_stat_activity "
+                    "WHERE datname=current_database() AND wait_event_type='Lock' "
+                    "AND query LIKE '%FROM households%'"
+                )
+            )
+        if waiting == 1:
+            return
+        sleep(0.01)
+    assert waiting == 1, "Request did not reach the held PostgreSQL household lock"
+
+
+def test_revoke_after_token_peek_is_observed_before_acceptance_commits(
+    clients: ClientFactory,
+    migrated_engine: Engine,
+) -> None:
+    household, recipient = home(clients), person(clients)
+    history = seed_target_history(household)
+    snapshot = profile_snapshot(migrated_engine, household.resident_id)
+    created = invite(household)
+    incoming = headers(recipient.client)
+    before = audit_count(migrated_engine)
+    with migrated_engine.connect() as blocker:
+        transaction = blocker.begin()
+        blocker.execute(
+            select(Household.id).where(Household.id == UUID(household.id)).with_for_update()
+        )
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            pending = executor.submit(
+                recipient.client.post,
+                "/api/v1/household-invitations/accept",
+                json={"token": created["token"]},
+                headers=incoming,
+            )
+            try:
+                wait_for_household_lock(migrated_engine)
+                # Fixture mutation stands for the revoke transaction that wins this lock.
+                blocker.execute(
+                    update(HouseholdInvitation)
+                    .where(HouseholdInvitation.id == UUID(created["id"]))
+                    .values(revoked_at=datetime.now(UTC), version=2)
+                )
+            finally:
+                transaction.commit()
+            denied = pending.result(timeout=10)
+    assert denied.status_code == 410
+    assert denied.json()["error_code"] == "INVITATION_UNAVAILABLE"
+    assert audit_count(migrated_engine) == before
+    assert action_count(migrated_engine, "invitation.accepted") == 0
+    assert action_count(migrated_engine, "member.access_linked") == 0
+    assert member(household)["user_id"] is None
+    assert target_history(household) == history
+    assert profile_snapshot(migrated_engine, household.resident_id) == snapshot
+    with Session(migrated_engine) as session:
+        invitation = session.get(HouseholdInvitation, UUID(created["id"]))
+        assert invitation is not None and invitation.accepted_at is None
+        assert invitation.accepted_by_user_id is None and invitation.version == 2
+        assert session.scalar(select(func.count()).select_from(HouseholdMember)) == 2
+        assert session.scalar(
+            select(func.count()).select_from(IdempotencyRecord).where(
+                IdempotencyRecord.actor_user_id == UUID(recipient.user_id)
+            )
+        ) == 0
+
+
+def test_household_listing_refreshes_role_after_waiting_for_downgrade(
+    clients: ClientFactory,
+    migrated_engine: Engine,
+) -> None:
+    household, recipient = home(clients), person(clients)
+    created = invite(household, role="editor")
+    assert accept(recipient, created["token"]).status_code == 200
+    before = audit_count(migrated_engine)
+    with migrated_engine.connect() as blocker:
+        transaction = blocker.begin()
+        blocker.execute(
+            select(Household.id).where(Household.id == UUID(household.id)).with_for_update()
+        )
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            pending = executor.submit(recipient.client.get, "/api/v1/households")
+            try:
+                wait_for_household_lock(migrated_engine)
+                blocker.execute(
+                    update(HouseholdMember)
+                    .where(HouseholdMember.id == UUID(household.resident_id))
+                    .values(role="viewer", access_version=2)
+                )
+            finally:
+                transaction.commit()
+            listed = pending.result(timeout=10)
+    assert listed.status_code == 200
+    assert listed.json()["households"] == [{
+        "id": household.id,
+        "name": "Dom QA",
+        "timezone": "Europe/Warsaw",
+        "currency": "PLN",
+        "role": "viewer",
+        "capabilities": {"can_edit": False, "can_manage_access": False},
+    }]
+    assert audit_count(migrated_engine) == before
+
+
+def test_target_write_waiting_for_access_revocation_cannot_commit_old_permissions(
+    clients: ClientFactory,
+    migrated_engine: Engine,
+) -> None:
+    household, recipient = home(clients), person(clients)
+    history = seed_target_history(household)
+    snapshot = profile_snapshot(migrated_engine, household.resident_id)
+    created = invite(household, role="editor")
+    assert accept(recipient, created["token"]).status_code == 200
+    incoming = headers(recipient.client)
+    before = audit_count(migrated_engine)
+    with migrated_engine.connect() as blocker:
+        transaction = blocker.begin()
+        blocker.execute(
+            select(Household.id).where(Household.id == UUID(household.id)).with_for_update()
+        )
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            pending = executor.submit(
+                recipient.client.put,
+                f"/api/v1/households/{household.id}/members/"
+                f"{household.resident_id}/nutrition-target",
+                json={
+                    "expected_version": 2,
+                    "kcal_target": "1900",
+                    "protein_target_g": "0",
+                    "carbs_target_g": None,
+                    "fat_target_g": "1.234",
+                    "goal_type": "custom",
+                    "valid_from": datetime.now(ZoneInfo("Europe/Warsaw")).date().isoformat(),
+                },
+                headers=incoming,
+            )
+            try:
+                wait_for_household_lock(migrated_engine)
+                blocker.execute(
+                    update(HouseholdMember)
+                    .where(HouseholdMember.id == UUID(household.resident_id))
+                    .values(access_enabled=False, access_version=2)
+                )
+            finally:
+                transaction.commit()
+            denied = pending.result(timeout=10)
+    assert denied.status_code == 404
+    assert audit_count(migrated_engine) == before
+    assert target_history(household) == history
+    assert profile_snapshot(migrated_engine, household.resident_id) == snapshot
+    assert member(household)["version"] == 2
+    assert member(household)["access_enabled"] is False
+    assert member(household)["user_id"] == recipient.user_id
