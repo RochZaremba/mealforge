@@ -70,7 +70,23 @@ export async function api<T>(
   const method = options.method ?? "GET";
   const serialized =
     options.body === undefined ? undefined : JSON.stringify(options.body);
-  const action = `${options.session?.user.id ?? "anonymous"}:${method}:${path}:${serialized}`;
+  let fingerprint = serialized ?? "";
+  if (options.session && method !== "GET") {
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(fingerprint),
+    );
+    fingerprint = Array.from(new Uint8Array(digest), (byte) =>
+      byte.toString(16).padStart(2, "0"),
+    ).join("");
+    if (generation !== authGeneration)
+      throw new ApiError(
+        401,
+        "SESSION_CHANGED",
+        "Sesja zmieniła się. Sprawdź zalogowane konto przed ponownym zapisem.",
+      );
+  }
+  const action = `${options.session?.user.id ?? "anonymous"}:${method}:${path}:${fingerprint}`;
   const headers = new Headers();
   let mutationKey: string | undefined;
   const confirmOperation = () => {

@@ -20,7 +20,7 @@ Private data and retry keys remain in memory only. An ambiguous network/server r
 
 ## WAVE-01-B: invitations and account access
 
-The household owner can create a 24-hour one-use invitation for an existing unlinked resident or a new profile, inspect invitation metadata, and revoke an invitation with its current version. The raw code appears only after confirmed creation in component memory. It is excluded from invitation-list state, cleared on hide/household/account change, never placed in URLs or storage, and copied only after an explicit button click and successful Clipboard API response. No emails or other messages are sent.
+The household owner can create a 24-hour one-use invitation for an existing unlinked resident or a new profile, inspect invitation metadata, and revoke an invitation with its current version. The raw code appears only after confirmed creation in component memory. It is excluded from invitation-list state, cleared on hide/household/account change, never placed in URLs or storage, and copied only after an explicit button click and successful Clipboard API response. The shared retry cache keeps a SHA-256 body fingerprint and request key rather than the raw invitation code. No emails or other messages are sent.
 
 A logged-in recipient enters the code in a password field and accepts it through an authenticated JSON POST. The UI refreshes confirmed session/membership before selecting the joined household; a failed follow-up read retries the confirmation rather than consuming the invitation again. Linking an existing profile preserves its member identifier, targets and history.
 
