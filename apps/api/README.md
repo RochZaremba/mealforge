@@ -1,4 +1,4 @@
-# MealForge API — WAVE-00 baseline
+# MealForge API — private household and original recipe slices
 
 Python 3.12, FastAPI/Pydantic 2, SQLAlchemy, psycopg, Alembic. From repository root:
 
@@ -47,8 +47,8 @@ is retained. Profiles append immutable history with optimistic versions, and war
 only when fully known `4P + 4C + 9F` differs from kcal by more than 5%. Targets have
 current/past effective dates in this slice; future scheduling is rejected explicitly.
 Slots are an atomic set of 1–12 rows, initially five; breakfast/dinner repetition is
-a persisted preference, applied by the future planner. Recipe editing, nutrition
-calculations, weekly plans and offline private data remain later slices.
+a persisted preference, applied by the future planner. Nutrition calculations,
+weekly plans and offline private data remain later slices.
 
 W01-B adds owner-only 24-hour invitations and access administration. Codes are
 64-character hex tokens returned only in create responses, submitted in JSON to
@@ -64,3 +64,25 @@ Owners cannot revoke or demote themselves; owner identity is verified through
 `owner_user_id`. Role/access changes have their own `access_version`, separate from
 target history. Household DTOs expose current `can_edit`/`can_manage_access`
 capabilities; private reads, writes, lists and retries all recheck current access.
+
+W01-C adds private original recipe create/read/edit and immutable version history.
+Every recipe remains `draft_requires_review`, `planner_eligible=false`; nutrients,
+allergens, measured cooked yield, timing, prices and storage are explicitly unknown.
+Ingredient amounts are positive canonical strings or integers, or `null`, with
+literal units and raw/cooked/unknown state; no conversion is inferred. Own text
+requires `rights_attestation=i_am_author` for the user's contribution. Original
+MealForge fixture attribution stays in immutable lineage when edited; new user
+contributions have no inferred public license. No external recipe is fetched.
+
+Recipe lists use `limit` (1–20) and `after` UUID cursors, returning summaries and
+`next_cursor`. History uses `limit` (1–5) and `before_version`, returning full snapshots
+and `next_before_version`. Mutations share household locks, optimistic versions,
+CSRF and idempotency; immutable history and a deferred composite current-version
+foreign key are enforced in PostgreSQL. Idempotency stores references, not recipe text.
+
+Only explicit POST `/api/v1/households/demo` with
+`{"confirmation":"create_separate_demo"}` creates a separate owned demo household,
+two sample 2700/1600 targets with null macros, five slots and three original drafts.
+It never modifies another household. `source=demo_seed` and demo warnings persist
+on household/target DTOs. The audited original fixture ships as an installed package
+resource; absence, excessive size or integrity drift aborts demo creation atomically.

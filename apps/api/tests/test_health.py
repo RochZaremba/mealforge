@@ -79,7 +79,8 @@ def test_openapi_is_deterministic_and_excludes_unimplemented_domains() -> None:
     assert generate_openapi() == generate_openapi()
     specification = json.loads(generate_openapi())
     assert {"/health", "/ready"} <= set(specification["paths"])
-    assert not any("recipe" in path or "plans" in path for path in specification["paths"])
+    assert "/api/v1/households/{household_id}/recipes" in specification["paths"]
+    assert not any("plans" in path or "imports" in path for path in specification["paths"])
     assert (
         "application/problem+json"
         in specification["paths"]["/ready"]["get"]["responses"]["503"]["content"]

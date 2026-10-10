@@ -1,6 +1,6 @@
 # W01-B review — single-use invitations and account access
 
-Local integrated gates passed. Exact-head CI is required before PR #3 merge; this slice does not complete W01-C or the product.
+Local gates and exactd650dd0 CI38082688574/38082684928 passed; PR #3 merged7b1df55; this slice does not complete W01-C or the product.
 
 ## Findings and corrections
 - P1 stale invitation ORM after waiting for a household lock could accept a revoked invitation or consume twice. Backend now peeks scalar IDs and refreshes locked rows; QA forces both recipients to wait before unlock, and revokes after the initial peek. Exactly one acceptance, or410/no link after revocation, is asserted in actual PostgreSQL.

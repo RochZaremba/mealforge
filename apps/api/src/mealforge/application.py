@@ -16,6 +16,8 @@ from mealforge.core.request_id import RequestIdMiddleware
 from mealforge.households.invitations import router as invitations_router
 from mealforge.households.routes import router as household_router
 from mealforge.identity.routes import router as identity_router
+from mealforge.recipes.demo import router as demo_router
+from mealforge.recipes.routes import router as recipe_router
 
 
 def problem_response(request: Request, status: int, code: str, message: str) -> JSONResponse:
@@ -52,8 +54,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.add_middleware(BodyLimitMiddleware)
     application.add_middleware(RequestIdMiddleware)
     application.include_router(identity_router)
+    application.include_router(demo_router)
     application.include_router(household_router)
     application.include_router(invitations_router)
+    application.include_router(recipe_router)
 
     @application.exception_handler(ApiError)
     async def api_error(request: Request, exc: ApiError) -> JSONResponse:

@@ -19,6 +19,9 @@ from mealforge.core.database import Base
 
 class Household(Base):
     __tablename__ = "households"
+    __table_args__ = (
+        CheckConstraint("source IN ('user_created','demo_seed')", name="ck_household_source"),
+    )
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column(String(80))
     owner_user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
@@ -26,6 +29,9 @@ class Household(Base):
     currency: Mapped[str] = mapped_column(String(3))
     slot_revision: Mapped[int] = mapped_column(default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    source: Mapped[str] = mapped_column(
+        String(16), default="user_created", server_default="user_created"
+    )
 
 
 class HouseholdMember(Base):

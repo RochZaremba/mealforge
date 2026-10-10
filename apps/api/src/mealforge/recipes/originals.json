@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "fixture_only": true,
+  "purpose": "Original authored preparation examples; not validated recipes or verified nutrient data.",
+  "recipes": [
+    {
+      "id": "original-millet-apple",
+      "title": "Kasza jaglana z jabłkiem i cynamonem",
+      "source_mode": "user_authored",
+      "source_url": null,
+      "provenance": {
+        "source_id": "original_fixture",
+        "author": "MealForge",
+        "rights_mode": "private_user_content",
+        "license": "CC0-1.0",
+        "license_scope": "original_recipe_text",
+        "attribution": "Original recipe fixture authored for MealForge; no external recipe copied."
+      },
+      "validation_status": "draft_requires_review",
+      "servings": 2,
+      "servings_basis": "intentional_recipe_design",
+      "yield_mass_g": null,
+      "yield_basis": "unknown_until_weighed_after_cooking",
+      "ingredients": [
+        {
+          "raw_name": "kasza jaglana sucha",
+          "amount": "100",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        },
+        {
+          "raw_name": "jabłko bez gniazda nasiennego",
+          "amount": "200",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        },
+        {
+          "raw_name": "woda",
+          "amount": "300",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        },
+        {
+          "raw_name": "cynamon mielony",
+          "amount": "1",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        }
+      ],
+      "instructions": [
+        "Wsyp kaszę do garnka, dodaj odmierzoną wodę i gotuj, mieszając w razie potrzeby.",
+        "Pokrój odważone jabłko, dodaj do kaszy i kontynuuj gotowanie do uzyskania wybranej miękkości.",
+        "Dodaj cynamon i wymieszaj. Zważ gotową potrawę przed podziałem."
+      ],
+      "nutrients": {
+        "kcal": null,
+        "protein_g": null,
+        "carbs_g": null,
+        "fat_g": null,
+        "fiber_g": null
+      },
+      "nutrient_provenance": null,
+      "allergen_status": "unknown",
+      "storage_method": null,
+      "storage_validation_ref": null,
+      "price": null,
+      "prep_time_min": null,
+      "cook_time_min": null,
+      "warnings": [
+        "Wartości odżywcze i alergeny wymagają weryfikacji.",
+        "Końcowy uzysk nie jest znany; zważ potrawę po przygotowaniu."
+      ]
+    },
+    {
+      "id": "original-lentil-carrot",
+      "title": "Czerwona soczewica z marchewką",
+      "source_mode": "user_authored",
+      "source_url": null,
+      "provenance": {
+        "source_id": "original_fixture",
+        "author": "MealForge",
+        "rights_mode": "private_user_content",
+        "license": "CC0-1.0",
+        "license_scope": "original_recipe_text",
+        "attribution": "Original recipe fixture authored for MealForge; no external recipe copied."
+      },
+      "validation_status": "draft_requires_review",
+      "servings": 2,
+      "servings_basis": "intentional_recipe_design",
+      "yield_mass_g": null,
+      "yield_basis": "unknown_until_weighed_after_cooking",
+      "ingredients": [
+        {
+          "raw_name": "soczewica czerwona sucha",
+          "amount": "120",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        },
+        {
+          "raw_name": "marchew obrana",
+          "amount": "200",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        },
+        {
+          "raw_name": "cebula obrana",
+          "amount": "80",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        },
+        {
+          "raw_name": "oliwa",
+          "amount": "10",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        },
+        {
+          "raw_name": "woda",
+          "amount": "400",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        }
+      ],
+      "instructions": [
+        "Posiekaj cebulę i pokrój marchew.",
+        "W garnku podgrzej oliwę i wymieszaj z warzywami.",
+        "Dodaj soczewicę i odmierzoną wodę. Gotuj, mieszając, aż soczewica i marchew będą miękkie.",
+        "Zważ gotową potrawę przed podziałem."
+      ],
+      "nutrients": {
+        "kcal": null,
+        "protein_g": null,
+        "carbs_g": null,
+        "fat_g": null,
+        "fiber_g": null
+      },
+      "nutrient_provenance": null,
+      "allergen_status": "unknown",
+      "storage_method": null,
+      "storage_validation_ref": null,
+      "price": null,
+      "prep_time_min": null,
+      "cook_time_min": null,
+      "warnings": [
+        "Wartości odżywcze i alergeny wymagają weryfikacji.",
+        "Końcowy uzysk nie jest znany; zważ potrawę po przygotowaniu."
+      ]
+    },
+    {
+      "id": "original-cucumber-tomato-sandwiches",
+      "title": "Kanapki z pomidorem i ogórkiem",
+      "source_mode": "user_authored",
+      "source_url": null,
+      "provenance": {
+        "source_id": "original_fixture",
+        "author": "MealForge",
+        "rights_mode": "private_user_content",
+        "license": "CC0-1.0",
+        "license_scope": "original_recipe_text",
+        "attribution": "Original recipe fixture authored for MealForge; no external recipe copied."
+      },
+      "validation_status": "draft_requires_review",
+      "servings": 2,
+      "servings_basis": "intentional_recipe_design",
+      "yield_mass_g": null,
+      "yield_basis": "unknown_until_weighed_after_cooking",
+      "ingredients": [
+        {
+          "raw_name": "pieczywo — skład i etykieta wymagają potwierdzenia",
+          "amount": "160",
+          "unit": "g",
+          "raw_or_cooked": "unknown",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        },
+        {
+          "raw_name": "pomidor bez szypułki",
+          "amount": "180",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        },
+        {
+          "raw_name": "ogórek",
+          "amount": "120",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        },
+        {
+          "raw_name": "oliwa",
+          "amount": "10",
+          "unit": "g",
+          "raw_or_cooked": "raw",
+          "nutrients_per_100g": {
+            "kcal": null,
+            "protein_g": null,
+            "carbs_g": null,
+            "fat_g": null,
+            "fiber_g": null
+          },
+          "nutrient_provenance": null,
+          "allergen_status": "unknown"
+        }
+      ],
+      "instructions": [
+        "Pokrój odważony pomidor i ogórek.",
+        "Rozłóż warzywa na odważonym pieczywie i dodaj oliwę.",
+        "Podziel według wybranych gramatur; wartości odżywcze oblicz dopiero po potwierdzeniu danych składników."
+      ],
+      "nutrients": {
+        "kcal": null,
+        "protein_g": null,
+        "carbs_g": null,
+        "fat_g": null,
+        "fiber_g": null
+      },
+      "nutrient_provenance": null,
+      "allergen_status": "unknown",
+      "storage_method": null,
+      "storage_validation_ref": null,
+      "price": null,
+      "prep_time_min": null,
+      "cook_time_min": null,
+      "warnings": [
+        "Wartości odżywcze i alergeny wymagają weryfikacji.",
+        "Końcowy uzysk nie jest znany; zważ potrawę po przygotowaniu."
+      ]
+    }
+  ]
+}

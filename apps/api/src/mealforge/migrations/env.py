@@ -4,6 +4,7 @@ from mealforge.core.config import Settings
 from mealforge.core.database import Base, build_engine
 from mealforge.households import models as household_models  # noqa: F401
 from mealforge.identity import models as identity_models  # noqa: F401
+from mealforge.recipes import models as recipe_models  # noqa: F401
 from mealforge.reference import models  # noqa: F401
 
 target_metadata = Base.metadata

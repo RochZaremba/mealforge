@@ -75,10 +75,20 @@ Migration0002 adds users/password_hash (Argon2id), sessions/token_hash only with
 
 Transactions lock the authenticated session for revocation consistency, member for target expected_version and household for slot revision. Idempotency uses a transaction-scoped PostgreSQL advisory lock; replay reauthorizes membership. Profile valid_from is a local date and cannot be future in A; history stays immutable. Guests/unlinked residents never authorize an account. Recipe/inventory/planning tables above remain requirements for future slices.
 
-## W01-B schema (implementation in progress; integrated gate pending)
+## W01-B schema (PR #3 merged; gates passed)
 
 Migration0003 adds `household_members.access_enabled` (default true) and `access_version` (default 0), separately from participation `active` and nutrition `target_revision`. Account access changes do not delete or rewrite nutrition profiles. Authorization and household listing require the current active, access-enabled membership and matching authenticated user.
 
 `household_invitations` stores UUID, household, creator, editor/viewer role, optional existing member scoped with a composite household FK, private random nonce, unique SHA256 token hash, issued/expiry timestamps, accepted-at/by, revoked-at and version. Raw codes are derived with a domain-separated HMAC and never stored in idempotency JSON or audit metadata. The owner identity is protected by `households.owner_user_id`, not a mutable role string.
 
 Acceptance, access changes and private household operations serialize on the same household lock before invitation/member locks. Locked ORM reloads must refresh preloaded objects to avoid stale role or invitation status after concurrent revocation. Acceptance atomically links a resident, consumes the invitation, writes metadata-only audit and records idempotency. Session revocation and current authorization checks also apply on replay. Tests must prove single use across distinct accounts and preservation of the existing resident profile.
+
+## W01-C schema (integration and verification pending)
+
+Migration0004 adds `households.source` with `user_created` for existing households and explicit `demo_seed` only for opt-in demo creation. Recipe identities in `recipes` carry UUID, household, current revision and timestamp. `recipe_versions` store scoped recipe UUID, positive version, acting user, timestamp and a Pydantic-validated JSONB snapshot. Snapshots preserve exact Decimal strings and unknown values; they do not claim normalized ingredient identities or verified nutrition. The deployed C schema is deliberately narrower than the future normalized recipe model above.
+
+Recipe version `(recipe_id, household_id, version)` is unique. A composite FK from the recipe's `(id, household_id, current_version)` to that key is `DEFERRABLE INITIALLY DEFERRED`, allowing atomic identity/version insertion while preventing an invalid pointer at transaction commit. Version rows refer back to the household-scoped identity; PostgreSQL guards reject version UPDATE and DELETE, including drafts. Updates append snapshots and advance the current revision under household lock with expected-version checking. There is no delete/archive endpoint in C.
+
+Recipe mutations write metadata-only audit and idempotency records in the same transaction; retries store references, reauthorize current membership and return the original committed version, even after later edits. Demo creation uses global authenticated-user scope, then current owner authorization on replay. All demo profiles, five slots and three recipe versions commit together. Normal household creation and startup never seed targets or recipes. Nutrition profile source already supports the explicit `demo_seed` value; existing user targets/history remain unchanged.
+
+Trusted original provenance comes exclusively from the packaged, bounded, audited fixture. Edited snapshots retain finite original attribution and a source-version reference, without copying an unbounded chain of historical snapshots. New user contributions have private rights with unknown license. No external recipe source adapter or fetch job is introduced.
