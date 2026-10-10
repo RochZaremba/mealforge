@@ -107,6 +107,14 @@ def main() -> int:
         validate(expected)
         installed = decode(files("mealforge.recipes").joinpath("originals.json").read_bytes())
         require(installed == expected, "Zainstalowany fixture różni się od repozytorium.")
+        # The same asset must also pass the server's audited fingerprint and snapshot validator.
+        from mealforge.core.api import ApiError
+        from mealforge.recipes.service import original_snapshots
+
+        try:
+            require(len(original_snapshots()) == 3, "Runtime loader nie zwrócił trzech szkiców.")
+        except ApiError:
+            raise ValueError("Runtime loader odrzucił fixture.") from None
         if args.docker:
             check_docker(digest(expected))
     except (ValueError, KeyError, TypeError, InvalidOperation, OSError, ImportError,
