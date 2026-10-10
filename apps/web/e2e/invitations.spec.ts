@@ -27,6 +27,14 @@ async function enterPrivateValue(input: Locator, value: string): Promise<void> {
   }, value);
 }
 
+async function captureSanitizedState(page: Page, path: string): Promise<void> {
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    window.scrollTo(0, 0);
+  });
+  await page.screenshot({ path, fullPage: true, animations: 'disabled' });
+}
+
 async function registerAndLogin(page: Page, name: string) {
   const identifier = randomUUID();
   const password = `Qa-${identifier}!`;
@@ -129,7 +137,7 @@ test('viewer joins an existing profile once and loses access without losing nutr
     });
     expect(denied.status()).toBe(403);
     expect((await (await owner.request.get(historyPath)).json()).history).toEqual(originalHistory);
-    await recipient.screenshot({ path: testInfo.outputPath('viewer-profile.png'), fullPage: true });
+    await captureSanitizedState(recipient, testInfo.outputPath('viewer-profile.png'));
 
     await confirmed(owner, 'GET', `/${householdId}/members`, () => owner.getByRole('button', { name: 'Odśwież gospodarstwo', exact: true }).click(), 200);
     const changed = await confirmed(owner, 'PUT', `/members/${resident.id}/access`, () => card.getByRole('button', { name: 'Odbierz dostęp Zaproszona osoba', exact: true }).click(), 200);
@@ -146,8 +154,8 @@ test('viewer joins an existing profile once and loses access without losing nutr
     expect((await (await owner.request.get(`${base}/members`)).json()).members).toHaveLength(2);
     expect(await owner.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     expect(await recipient.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    await owner.screenshot({ path: testInfo.outputPath('owner-retained-profile.png'), fullPage: true });
-    await recipient.screenshot({ path: testInfo.outputPath('revoked-access.png'), fullPage: true });
+    await captureSanitizedState(owner, testInfo.outputPath('owner-retained-profile.png'));
+    await captureSanitizedState(recipient, testInfo.outputPath('revoked-access.png'));
     expect(pageErrors).toEqual([]);
   } finally {
     // Clear browser memory before the runner generates a failure DOM snapshot.
