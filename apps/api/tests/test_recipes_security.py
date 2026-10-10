@@ -422,7 +422,7 @@ def test_recipe_history_and_list_pagination_reach_every_version_with_bounds(
                 json={
                     **payload(),
                     "expected_version": version,
-                    "instructions": [f"Wersja {version + 1}"],
+                    "instructions": ["🥕" * 499 + str(version + 1) for _ in range(7)],
                 },
                 headers=headers(owner),
             ).status_code
@@ -445,6 +445,10 @@ def test_recipe_history_and_list_pagination_reach_every_version_with_bounds(
             break
         assert len(versions) <= 7
     assert versions == [7, 6, 5, 4, 3, 2, 1]
+    large_page = owner.get(path(hid, rid) + "/history", params={"limit": 5})
+    assert large_page.status_code == 200
+    assert 50000 < len(large_page.content) < 262144
+    assert len(large_page.json()["history"]) == 5
     assert owner.get(path(hid), params={"limit": 21}).status_code == 422
     assert owner.get(path(hid), params={"after": "not-a-uuid"}).status_code == 422
     assert owner.get(path(hid, rid) + "/history", params={"limit": 6}).status_code == 422
@@ -700,3 +704,71 @@ def test_same_account_distinct_sessions_concurrent_demo_key_create_only_one_demo
     with Session(migrated_engine) as session:
         assert session.scalar(select(func.count()).select_from(HouseholdMember)) == 2
         assert session.scalar(select(func.count()).select_from(NutritionProfile)) == 2
+
+
+def test_composite_snapshot_foreign_key_rejects_a_version_in_a_foreign_household(
+    clients: ClientFactory,
+    migrated_engine: Engine,
+) -> None:
+    owner = account(clients)
+    first_hid, foreign_hid = household(owner), household(owner)
+    recipe = create(owner, first_hid)
+    with Session(migrated_engine) as session:
+        original = session.get(RecipeVersion, UUID(recipe["version_id"]))
+        assert original is not None
+        row = RecipeVersion(
+            id=uuid4(),
+            recipe_id=original.recipe_id,
+            household_id=UUID(foreign_hid),
+            version=2,
+            snapshot=original.snapshot,
+            created_at=original.created_at,
+            actor_user_id=original.actor_user_id,
+        )
+        session.add(row)
+        with pytest.raises(IntegrityError) as invalid:
+            session.commit()
+        assert invalid.value.orig.sqlstate == "23503"
+        session.rollback()
+    with migrated_engine.connect() as connection:
+        constraint = connection.execute(
+            text(
+                "SELECT condeferrable, condeferred FROM pg_constraint "
+                "WHERE conname='fk_recipe_current_version'"
+            )
+        ).one()
+        assert tuple(constraint) == (True, True)
+    assert owner.get(path(first_hid, recipe["id"])).json() == recipe
+    assert owner.get(path(foreign_hid)).json()["recipes"] == []
+
+
+def test_deferred_current_version_constraint_allows_valid_identity_first_append(
+    clients: ClientFactory,
+    migrated_engine: Engine,
+) -> None:
+    owner = account(clients)
+    hid = household(owner)
+    recipe = create(owner, hid)
+    with Session(migrated_engine) as session:
+        original = session.get(RecipeVersion, UUID(recipe["version_id"]))
+        assert original is not None
+        # The current reference is temporarily absent, but valid by transaction commit.
+        session.execute(
+            update(Recipe).where(Recipe.id == UUID(recipe["id"])).values(current_version=2)
+        )
+        session.add(
+            RecipeVersion(
+                id=uuid4(),
+                recipe_id=original.recipe_id,
+                household_id=original.household_id,
+                version=2,
+                snapshot=original.snapshot,
+                created_at=original.created_at,
+                actor_user_id=original.actor_user_id,
+            )
+        )
+        session.commit()
+    assert owner.get(path(hid, recipe["id"])).json()["version"] == 2
+    history = owner.get(path(hid, recipe["id"]) + "/history").json()["history"]
+    assert [entry["version"] for entry in history] == [2, 1]
+    assert history[1] == recipe

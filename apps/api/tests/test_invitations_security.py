@@ -766,6 +766,7 @@ def test_household_listing_refreshes_role_after_waiting_for_downgrade(
         "timezone": "Europe/Warsaw",
         "currency": "PLN",
         "role": "viewer",
+        "source": "user_created",
         "capabilities": {"can_edit": False, "can_manage_access": False},
     }]
     assert audit_count(migrated_engine) == before
