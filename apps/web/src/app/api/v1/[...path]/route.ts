@@ -23,6 +23,10 @@ const routes: [RegExp, readonly string[]][] = [
   [new RegExp(`^households/${UUID}/invitations/${UUID}/revoke$`), ["POST"]],
   [/^household-invitations\/accept$/, ["POST"]],
   [new RegExp(`^households/${UUID}/members/${UUID}/access$`), ["PUT"]],
+  [/^households\/demo$/, ["POST"]],
+  [new RegExp(`^households/${UUID}/recipes$`), ["GET", "POST"]],
+  [new RegExp(`^households/${UUID}/recipes/${UUID}$`), ["GET", "PUT"]],
+  [new RegExp(`^households/${UUID}/recipes/${UUID}/history$`), ["GET"]],
 ];
 const privateHeaders = { "Cache-Control": "no-store", Vary: "Cookie" };
 function problem(status: number, message: string, error_code: string) {
@@ -76,6 +80,19 @@ async function proxy(
   if (!allowed) return problem(404, "Nie znaleziono usługi.", "NOT_FOUND");
   if (!allowed[1].includes(request.method))
     return problem(405, "Ta operacja nie jest dostępna.", "METHOD_NOT_ALLOWED");
+  const incomingQuery = new URL(request.url).searchParams;
+  const pagination = new URLSearchParams();
+  const listPage = request.method === "GET" && new RegExp(`^households/${UUID}/recipes$`).test(pathname);
+  const historyPage = request.method === "GET" && new RegExp(`^households/${UUID}/recipes/${UUID}/history$`).test(pathname);
+  for (const [name, value] of incomingQuery) {
+    if (incomingQuery.getAll(name).length !== 1)
+      return problem(400, "Nieprawidłowe parametry strony.", "INVALID_PAGINATION");
+    const valid = name === "limit" && (listPage || historyPage) && /^(?:[1-9]|1[0-9]|20)$/.test(value) && Number(value) <= (historyPage ? 5 : 20)
+      || name === "after" && listPage && new RegExp(`^${UUID}$`).test(value)
+      || name === "before_version" && historyPage && /^[1-9][0-9]{0,8}$/.test(value);
+    if (!valid) return problem(400, "Nieprawidłowe parametry strony.", "INVALID_PAGINATION");
+    pagination.set(name, value);
+  }
   const mutation = request.method !== "GET";
   const origin = request.headers.get("origin");
   let allowedOrigins: string[];
@@ -158,6 +175,7 @@ async function proxy(
       `/api/v1/${pathname}`,
       process.env.API_BASE_URL ?? "http://localhost:8000",
     );
+    upstream.search = pagination.toString();
     const response = await fetch(upstream, {
       method: request.method,
       headers,

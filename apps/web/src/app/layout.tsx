@@ -4,6 +4,7 @@ import { Navigation } from "@/components/navigation";
 import { Icon } from "@/components/icon";
 import { PwaRegistration } from "@/components/pwa-registration";
 import { SessionProvider } from "@/components/session-provider";
+import { HouseholdProvider } from "@/components/household-provider";
 import "./globals.css";
 export const metadata: Metadata = {
   title: { default: "MealForge — wspólna kuchnia", template: "%s | MealForge" },
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="pl">
       <body>
         <SessionProvider>
+          <HouseholdProvider>
           <a className="skip-link" href="#main-content">
             Przejdź do treści
           </a>
@@ -69,6 +71,7 @@ export default function RootLayout({
               </footer>
             </div>
           </div>
+          </HouseholdProvider>
         </SessionProvider>
       </body>
     </html>

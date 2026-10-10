@@ -15,11 +15,13 @@ export type Household = {
   timezone: string;
   currency: string;
   role: string;
+  source: "user_created" | "demo_seed";
   capabilities: { can_edit: boolean; can_manage_access: boolean };
 };
 export type Target = {
   id: string;
   version: number;
+  source: "user_set" | "demo_seed";
   kcal_target: string | null;
   protein_target_g: string | null;
   carbs_target_g: string | null;
@@ -128,6 +130,9 @@ export async function api<T>(
     );
   }
   if (!response.ok) {
+    const householdPath = /^households\/([0-9a-fA-F-]{36})(?:\/|$)/.exec(path);
+    if ((response.status === 403 || response.status === 404) && householdPath && generation === authGeneration && typeof window !== "undefined")
+      window.dispatchEvent(new CustomEvent("mealforge-household-denied", { detail: { householdId: householdPath[1] } }));
     if (
       response.status === 401 &&
       generation === authGeneration &&

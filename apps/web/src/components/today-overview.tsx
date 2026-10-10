@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   api,
+  ApiError,
   displayDecimal,
   errorMessage,
   type Household,
@@ -10,6 +11,7 @@ import {
   type SlotSet,
 } from "@/lib/api";
 import { useSession } from "./session-provider";
+import { HouseholdSelector, useHousehold } from "./household-provider";
 const defaults = [
   "Śniadanie",
   "Drugie śniadanie",
@@ -18,6 +20,7 @@ const defaults = [
   "Kolacja",
 ];
 function PrivateOverview() {
+  const { household, loading: householdLoading, error: householdError, refreshHouseholds } = useHousehold();
   const [data, setData] = useState<{
     household: Household;
     members: Member[];
@@ -29,10 +32,6 @@ function PrivateOverview() {
     let active = true;
     async function load() {
       try {
-        const { households } = await api<{ households: Household[] }>(
-          "households",
-        );
-        const household = households[0];
         if (!household) return;
         const [people, presets] = await Promise.all([
           api<{ members: Member[] }>(`households/${household.id}/members`),
@@ -40,7 +39,12 @@ function PrivateOverview() {
         ]);
         if (active) setData({ household, members: people.members, presets });
       } catch (problem) {
-        if (active) setError(errorMessage(problem));
+        if (active) {
+          setData(null);
+          setError(errorMessage(problem));
+          if (problem instanceof ApiError && (problem.status === 403 || problem.status === 404))
+            void refreshHouseholds().catch(() => {});
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -49,18 +53,18 @@ function PrivateOverview() {
     return () => {
       active = false;
     };
-  }, []);
-  if (loading)
+  }, [household, refreshHouseholds]);
+  if (loading || householdLoading)
     return (
       <p className="loading-message" role="status">
         Pobieranie Waszego rytmu dnia…
       </p>
     );
-  if (error)
+  if (error || householdError)
     return (
       <div className="form-card">
         <p className="form-error" role="alert">
-          {error}
+          {error || householdError}
         </p>
         <Link className="text-link" href="/household">
           Sprawdź gospodarstwo
@@ -81,6 +85,7 @@ function PrivateOverview() {
     );
   return (
     <>
+      <HouseholdSelector />
       <section aria-labelledby="today-targets">
         <div className="section-heading">
           <h2 id="today-targets">Cele domowników</h2>
@@ -96,6 +101,7 @@ function PrivateOverview() {
           {data.members.map((member) => (
             <section className="form-card" key={member.id}>
               <h3>{member.display_name}</h3>
+              {member.nutrition_target?.source === "demo_seed" && <p className="note">Przykładowy cel demo — nie jest zaleceniem.</p>}
               <dl className="target-summary">
                 {(
                   [
@@ -166,8 +172,9 @@ function MealList({
 }
 export function TodayOverview() {
   const { session } = useSession();
+  const { selectedId } = useHousehold();
   return session ? (
-    <PrivateOverview key={session.user.id} />
+    <PrivateOverview key={`${session.user.id}-${selectedId}`} />
   ) : (
     <MealList slots={defaults.map((name) => ({ name, repeat: false }))} />
   );

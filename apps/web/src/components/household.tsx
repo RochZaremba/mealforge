@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   api,
   currentAuthGeneration,
@@ -15,6 +15,7 @@ import {
   type Target,
 } from "@/lib/api";
 import { useSession } from "./session-provider";
+import { HouseholdSelector, useHousehold } from "./household-provider";
 import {
   InvitationAccept,
   InvitationManager,
@@ -173,6 +174,8 @@ const targetFields = [
 ] as const;
 function TargetSummary({ target }: { target: Target | null }) {
   return (
+    <>
+    {target && <p className="note">{target.source === "demo_seed" ? "Przykładowy cel demo — nie jest zaleceniem." : "Cel ustawiony przez domownika."}</p>}
     <dl className="target-summary" data-testid="target-summary">
       {targetFields.map(([key, label]) => (
         <div key={key}>
@@ -192,6 +195,7 @@ function TargetSummary({ target }: { target: Target | null }) {
         </div>
       ))}
     </dl>
+    </>
   );
 }
 function MemberCard({
@@ -636,47 +640,23 @@ function AuthenticatedHousehold() {
     refresh,
     setSession,
   } = useSession();
-  const [households, setHouseholds] = useState<Household[]>([]);
-  const [selected, setSelected] = useState("");
-  const [members, setMembers] = useState<Member[]>([]);
-  const [presets, setPresets] = useState<SlotSet | null>(null);
+  const { households, selectedId: selected, household, loading: dataLoading, error: householdError,
+    selectHousehold: setSelected, refreshHouseholds, confirmHouseholds, addConfirmedHousehold } = useHousehold();
+  const selectionRef = useRef(selected);
+  useLayoutEffect(() => { selectionRef.current = selected; }, [selected]);
+  const [loadedMembers, setMembers] = useState<Member[]>([]);
+  const [loadedPresets, setPresets] = useState<SlotSet | null>(null);
+  const [loadedHouseholdId, setLoadedHouseholdId] = useState("");
+  const members = loadedHouseholdId === selected ? loadedMembers : [];
+  const presets = loadedHouseholdId === selected ? loadedPresets : null;
   const [householdName, setHouseholdName] = useState("");
   const [memberName, setMemberName] = useState("");
-  const [dataLoading, setDataLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [reload, setReload] = useState(0);
   useEffect(() => {
-    if (!session) return;
-    let active = true;
-    api<{ households: Household[] }>("households")
-      .then((result) => {
-        if (active) {
-          setHouseholds(result.households);
-          setSelected((current) =>
-            result.households.some((h) => h.id === current)
-              ? current
-              : (result.households[0]?.id ?? ""),
-          );
-        }
-      })
-      .catch((problem) => {
-        if (active) {
-          setError(errorMessage(problem));
-          if (problem instanceof ApiError && problem.status === 401)
-            setSession(null);
-        }
-      })
-      .finally(() => {
-        if (active) setDataLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [session, setSession, reload]);
-  useEffect(() => {
-    if (!session || !selected) return;
+    if (!session || !selected || dataLoading) return;
     let active = true;
     Promise.all([
       api<{ members: Member[] }>(`households/${selected}/members`),
@@ -686,11 +666,17 @@ function AuthenticatedHousehold() {
         if (active) {
           setMembers(people.members);
           setPresets(slots);
+          setLoadedHouseholdId(selected);
         }
       })
       .catch((problem) => {
         if (active) {
           setError(errorMessage(problem));
+          setMembers([]);
+          setPresets(null);
+          setLoadedHouseholdId("");
+          if (problem instanceof ApiError && (problem.status === 403 || problem.status === 404))
+            void refreshHouseholds().catch(() => {});
           if (problem instanceof ApiError && problem.status === 401)
             setSession(null);
         }
@@ -698,7 +684,7 @@ function AuthenticatedHousehold() {
     return () => {
       active = false;
     };
-  }, [session, selected, reload, setSession]);
+  }, [session, selected, reload, setSession, dataLoading, refreshHouseholds]);
   async function logout() {
     if (!session) return;
     const generation = currentAuthGeneration();
@@ -708,7 +694,6 @@ function AuthenticatedHousehold() {
       await api("auth/logout", { method: "POST", body: {}, session });
       if (generation !== currentAuthGeneration()) return;
       setSession(null);
-      setHouseholds([]);
       setMembers([]);
       setPresets(null);
       setSelected("");
@@ -735,8 +720,7 @@ function AuthenticatedHousehold() {
           currency: "PLN",
         },
       });
-      setHouseholds((current) => [...current, household]);
-      setSelected(household.id);
+      addConfirmedHousehold(household);
       setHouseholdName("");
       setSuccess("Gospodarstwo utworzone. Dodaj drugiego domownika.");
     } catch (problem) {
@@ -747,7 +731,9 @@ function AuthenticatedHousehold() {
   }
   async function addMember(event: React.FormEvent) {
     event.preventDefault();
-    if (!session || !selected) return;
+    if (!session || !selected || dataLoading) return;
+    const generation = currentAuthGeneration();
+    const householdId = selected;
     setBusy(true);
     setError("");
     setSuccess("");
@@ -761,13 +747,14 @@ function AuthenticatedHousehold() {
           role: "viewer",
         },
       });
+      if (generation !== currentAuthGeneration() || selectionRef.current !== householdId) return;
       setMembers((current) => [...current, member]);
       setMemberName("");
       setSuccess("Domownik dodany i potwierdzony przez serwer.");
     } catch (problem) {
-      setError(errorMessage(problem));
+      if (generation === currentAuthGeneration() && selectionRef.current === householdId) setError(errorMessage(problem));
     } finally {
-      setBusy(false);
+      if (generation === currentAuthGeneration()) setBusy(false);
     }
   }
   async function joinHousehold(result: InvitationAccepted) {
@@ -798,15 +785,13 @@ function AuthenticatedHousehold() {
         "Nie można potwierdzić dostępu do gospodarstwa. Odśwież listę gospodarstw.",
       );
     setSession(confirmedSession);
-    setHouseholds(confirmedHouseholds.households);
-    setSelected(joined.id);
+    confirmHouseholds(confirmedHouseholds.households, joined.id);
     setMembers([]);
     setPresets(null);
     setReload((value) => value + 1);
     setError("");
     setSuccess("Zaproszenie przyjęte. Dołączono do gospodarstwa.");
   }
-  const household = households.find((h) => h.id === selected);
   if (loading)
     return (
       <p className="loading-message" role="status">
@@ -843,14 +828,14 @@ function AuthenticatedHousehold() {
           Wyloguj się
         </button>
       </section>
-      <Feedback error={error} success={success} />
+      <Feedback error={error || householdError} success={success} />
       <InvitationAccept
         key={selected || "no-household"}
         session={session}
         onAccepted={joinHousehold}
       />
       {dataLoading && <p role="status">Pobieranie gospodarstwa…</p>}
-      {households.length === 0 && !dataLoading ? (
+      {dataLoading ? null : households.length === 0 ? (
         <section className="form-card">
           <h2>Stwórz wspólną kuchnię</h2>
           <form onSubmit={createHousehold}>
@@ -873,28 +858,7 @@ function AuthenticatedHousehold() {
         </section>
       ) : (
         <>
-          {households.length > 1 && (
-            <label htmlFor="household-select">
-              Gospodarstwo
-              <select
-                id="household-select"
-                value={selected}
-                onChange={(e) => {
-                  setSelected(e.target.value);
-                  setMembers([]);
-                  setPresets(null);
-                  setError("");
-                  setSuccess("");
-                }}
-              >
-                {households.map((h) => (
-                  <option key={h.id} value={h.id}>
-                    {h.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+          <HouseholdSelector />
           {household && (
             <section className="form-card">
               <div className="card-heading">
@@ -908,7 +872,7 @@ function AuthenticatedHousehold() {
                   className="secondary-button"
                   type="button"
                   onClick={() => {
-                    setDataLoading(true);
+                    void refreshHouseholds().catch(() => {});
                     setReload((value) => value + 1);
                     setPresets(null);
                     setMembers([]);
