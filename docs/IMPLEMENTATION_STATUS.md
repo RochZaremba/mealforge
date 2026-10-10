@@ -1,11 +1,11 @@
 # Status implementacji — aktualizuj po każdej fali
 
-**2026-10-10:** WAVE-00 ukończona i scalona przez PR #1 (62fe10c); WAVE-01-A ukończona przez PR2 (d544a88); WAVE-01-B w implementacji. Repo zaczynało jako SPEC KIT; aplikacja nie jest jeszcze ukończona.
+**2026-10-10:** WAVE-00 ukończona i scalona przez PR #1 (62fe10c); WAVE-01-A ukończona przez PR2 (d544a88); WAVE-01-B lokalne testy i review PASS; PR3 przed końcowym CI/merge. Repo zaczynało jako SPEC KIT; aplikacja nie jest jeszcze ukończona.
 
 | Wave | Status | Evidence |
 |---|---|---|
 | WAVE-00 | COMPLETE (tests run; CI PASS; merged) | PR #1 merged62fe10c; Actions38066767207+38066764096 PASS head185425a;16API/4PG,10E2E mobile+desktop,realCompose,backup restore; independent reviewer/security gate PASS; docs/TEST_REPORT.md |
-| WAVE-01 | IN PROGRESS | W01-A COMPLETE: PR2 merged d544a88, exact4eaf CI PASS;59API+14E2E/11-tablebackup. W01-B IN PROGRESS. Zaproszenia/przepisy B/C niezrealizowane |
+| WAVE-01 | IN PROGRESS | W01-A COMPLETE: PR2 merged d544a88, exact4eaf CI PASS;59API+14E2E/11-tablebackup. W01-B LOCAL GATES PASS:83API/16E2E,12-table restore, independent review; PR3 final CI/merge gate. Przepisy/demo C niezrealizowane |
 | WAVE-02 | NOT STARTED | brak importera/nutrition engine |
 | WAVE-03 | NOT STARTED | brak planera |
 | WAVE-04 | NOT STARTED | brak kitchen/inventory/shopping |

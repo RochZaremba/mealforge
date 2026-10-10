@@ -92,3 +92,9 @@ Final exact-head4eaf30c CI PASS: Actions38075073982+38075070579, including Postg
 - Fixed source2a57017 actual `make dev` rerun: exit0; three distinct sibling-key namespaces and Docker production build11routes. `make validate-kit check-contract lint typecheck`: exit0;151kit checks, no failures/skips, OpenAPI exact, Ruff/eslint/mypy27/tsc PASS.
 - Root `make test` afterd667a3a forced-interleaving tests: exit0,83pytest80.23s, no skips; integrity1 and target-contract4 PASS. Independent owned B security suite18passed27.58s.
 - Second independent B browser run still failed2cases: DOM now has exactly one invitation form (source fix effective); exact getByLabel on a nested select includes option text. QA switching to accessible combobox names and shorter deadlines. Native secret entry successfully reached authenticated target version2; prior logs/error-context contain no64hex codes (boolean-only scans).
+
+### W01-B final local gate
+- New B QA `39428db` + screenshot-only `010b38c` integrated asf019092/5784c46. Independent2browserflows PASS9.0s, then8.9s after screenshot normalization; no overflow/JS errors. Traces absent, code-shaped strings absent from logs/context; six synthetic sanitized PNGs copied to docs/evidence/wave-01-b and reviewed.
+- Root `PLAYWRIGHT_NO_SERVER=1 make e2e`: exit0,16passed17.2s official bundled Chrome, actual Docker; includes all14A/W00regressions and2B two-account lifecycle cases.
+- After actual B browser writes, `make backup-test`: exit0,12tables554rows exact; snapshot includes2actual invitation records plus42profiles/112audit/110idempotency rows. Counts only; no private values printed.
+- Final local source review: docs/reviews/WAVE-01-B.md. Exact final-head CI remains merge gate; priorbf0 CI did not include new B browser cases.
