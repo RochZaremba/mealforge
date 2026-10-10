@@ -97,6 +97,13 @@ test('saved links stay literal, private and link-only through pagination, viewer
     await expect(owner.getByTestId('recipe-link-form')).toBeVisible();
     await expect(owner.getByRole('textbox', { name: 'Własny tytuł linku', exact: true })).toHaveValue(title);
     await expect(owner.getByRole('textbox', { name: 'Własna notatka (opcjonalnie)', exact: true })).toHaveValue(note);
+    await owner.getByRole('textbox', { name: 'Adres strony (HTTPS)', exact: true }).fill('https://127.0.0.1/private-qa');
+    await confirmed(owner, 'POST', '/recipe-links', () => owner.getByRole('button', {
+      name: 'Zapisz link', exact: true,
+    }).click(), 422);
+    await expect(owner.getByTestId('recipe-link-card')).toHaveCount(0);
+    await expect(owner.getByRole('textbox', { name: 'Własna notatka (opcjonalnie)', exact: true })).toHaveValue(note);
+    await owner.getByRole('textbox', { name: 'Adres strony (HTTPS)', exact: true }).fill(url);
     const saved = await confirmed(owner, 'POST', '/recipe-links', () => owner.getByRole('button', {
       name: 'Zapisz link', exact: true,
     }).click(), 201);
