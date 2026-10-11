@@ -26,3 +26,5 @@ Przyjęte decyzje architektury; każdą istotną zmianę dokumentuj nowym ADR.
 - [0017 Private link-only recipe bookmarks](ADR/0017-private-link-only-bookmarks.md)
 
 - [0018 Bounded private own JSON-LD preview](ADR/0018-bounded-private-jsonld-preview.md)
+
+- [0019 Private own JSON-LD import origin](ADR/0019-private-jsonld-import-origin.md)

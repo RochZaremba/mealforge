@@ -1,6 +1,6 @@
 # MealForge — zestaw startowy repozytorium dla Codexa
 
-> Stan: **WAVE-00, WAVE-01, W02-A i W02-B1 scalone po testach, review i CI**. Działają API/DB/web, logowanie, prywatne gospodarstwa, cele i historia domowników, ustawienia posiłków, zaproszenia, zarządzanie dostępem, wersjonowane własne przepisy, osobne demo, linki bez pobierania stron oraz lokalny podgląd własnego JSON-LD (PR6,300API/30E2E PASS). Zapis importu z pełnym pochodzeniem, obliczenia żywieniowe, planowanie i kuchnia pozostają kolejnymi etapami; aplikacja nie jest jeszcze gotowym produktem.
+> Stan: **WAVE-00, WAVE-01, W02-A i W02-B1 scalone po testach, review i CI**. Działają API/DB/web, logowanie, prywatne gospodarstwa, cele i historia domowników, ustawienia posiłków, zaproszenia, zarządzanie dostępem, wersjonowane własne przepisy, osobne demo, linki bez pobierania stron oraz lokalny podgląd własnego JSON-LD (PR6,300API/30E2E PASS). W02-B2 dodaje jawny zapis własnego JSON-LD z niezmiennym pochodzeniem (lokalny review i testy PASS, końcowe CI przed merge). Normalizacja, obliczenia żywieniowe, planowanie i kuchnia pozostają kolejnymi etapami; aplikacja nie jest jeszcze gotowym produktem.
 
 **Cel:** self-hosted PWA do planowania jedzenia dla dwóch osób (i gości), z osobnymi kaloriami i makro, wspólnym gotowaniem, meal prepem w słoikach/pojemnikach, magazynem, wydarzeniami i automatycznymi zakupami.
 

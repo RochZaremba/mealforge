@@ -30,6 +30,7 @@ def snapshot(
     original: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     origin = None
+    import_origin = None
     if original:
         provenance = original["provenance"]
         origin = {
@@ -41,10 +42,11 @@ def snapshot(
             "attribution": provenance["attribution"],
         }
     elif previous:
-        previous_origin = RecipeSnapshot.model_validate(
-            previous.snapshot
-        ).provenance.original_origin
+        previous_provenance = RecipeSnapshot.model_validate(previous.snapshot).provenance
+        previous_origin = previous_provenance.original_origin
         origin = previous_origin.model_dump(mode="json") if previous_origin else None
+        if previous_provenance.import_origin:
+            import_origin = previous_provenance.import_origin.model_dump(mode="json")
     data = {
         "title": payload.title,
         "instructions": payload.instructions,
@@ -71,6 +73,7 @@ def snapshot(
             "rights_attestation": None if original else payload.rights_attestation,
             "source_version_id": str(previous.id) if previous else None,
             "original_origin": origin,
+            "import_origin": import_origin,
         },
         "nutrients": UnknownNutrients().model_dump(),
         "allergen_status": "unknown",
@@ -87,7 +90,27 @@ def snapshot(
         "planner_eligible": False,
         "warnings": WARNINGS,
     }
-    return RecipeSnapshot.model_validate(data).model_dump(mode="json")
+    return validated_snapshot(data)
+
+
+def validated_snapshot(data: dict[str, Any]) -> dict[str, Any]:
+    """Budget the complete typed JSON, including immutable source-origin duplication."""
+    validated = RecipeSnapshot.model_validate(data).model_dump(mode="json")
+    try:
+        # PostgreSQL jsonb::text includes separator spaces; budget those rather than compact JSON.
+        size = len(json.dumps(validated, ensure_ascii=False).encode("utf-8"))
+    except UnicodeError:
+        raise ApiError(
+            422, "RECIPE_SNAPSHOT_INVALID", "Przepis zawiera nieprawidłowy tekst."
+        ) from None
+    if size > 32768:
+        raise ApiError(
+            422,
+            "RECIPE_SNAPSHOT_TOO_LARGE",
+            "Przepis z zachowanym pochodzeniem przekracza 32 KiB. "
+            "Skróć własny dokument lub treść zmiany; dane nie zostały zapisane.",
+        )
+    return validated
 
 
 def append_version(db: Session, recipe: Recipe, actor: UUID, data: dict[str, Any]) -> RecipeVersion:
@@ -95,7 +118,7 @@ def append_version(db: Session, recipe: Recipe, actor: UUID, data: dict[str, Any
         recipe_id=recipe.id,
         household_id=recipe.household_id,
         version=recipe.current_version,
-        snapshot=RecipeSnapshot.model_validate(data).model_dump(mode="json"),
+        snapshot=validated_snapshot(data),
         created_at=now(),
         actor_user_id=actor,
     )
@@ -105,6 +128,7 @@ def append_version(db: Session, recipe: Recipe, actor: UUID, data: dict[str, Any
 
 
 def new_recipe(db: Session, household: UUID, actor: UUID, data: dict[str, Any]) -> RecipeVersion:
+    data = validated_snapshot(data)  # Reject before inserting even the deferred recipe identity.
     recipe = Recipe(household_id=household, current_version=1, created_at=now())
     db.add(recipe)
     db.flush()  # Deferred current-version FK is checked when the complete transaction commits.

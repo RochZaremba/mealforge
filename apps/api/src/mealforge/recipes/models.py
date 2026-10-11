@@ -2,7 +2,15 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, ForeignKeyConstraint, UniqueConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Index,
+    UniqueConstraint,
+    text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -45,6 +53,16 @@ class RecipeVersion(Base):
         CheckConstraint("version >= 1", name="ck_recipe_version"),
         CheckConstraint("jsonb_typeof(snapshot) = 'object'", name="ck_recipe_snapshot_object"),
         CheckConstraint("octet_length(snapshot::text) <= 32768", name="ck_recipe_snapshot_size"),
+        Index(
+            "uq_recipe_import_source",
+            "household_id",
+            text("(snapshot #>> '{provenance,import_origin,source_sha256}'::text[])"),
+            unique=True,
+            postgresql_where=text(
+                "version = 1 AND "
+                "(snapshot #>> '{provenance,import_origin,source_sha256}'::text[]) IS NOT NULL"
+            ),
+        ),
     )
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     recipe_id: Mapped[UUID]

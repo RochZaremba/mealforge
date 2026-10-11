@@ -30,6 +30,7 @@ const routes: [RegExp, readonly string[]][] = [
   [new RegExp(`^households/${UUID}/recipe-links$`), ["GET", "POST"]],
   [new RegExp(`^households/${UUID}/recipe-links/${UUID}$`), ["GET"]],
   [new RegExp(`^households/${UUID}/recipe-imports/preview$`), ["POST"]],
+  [new RegExp(`^households/${UUID}/recipe-imports$`), ["POST"]],
 ];
 const privateHeaders = { "Cache-Control": "no-store", Vary: "Cookie" };
 function problem(status: number, message: string, error_code: string) {
