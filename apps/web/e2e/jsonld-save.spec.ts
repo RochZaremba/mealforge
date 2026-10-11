@@ -133,6 +133,15 @@ test('explicit JSON-LD save preserves draft failures, original unknowns and immu
   await expect(form.getByRole('alert')).toBeVisible();
   expect((await (await page.request.get(`${base}/recipes`)).json()).recipes).toEqual([]);
 
+  // Use the same account to prove an earlier detail read cannot overwrite a
+  // newer confirmed import selection. This creates a real unrelated recipe.
+  const existingResponse = await page.request.post(`${base}/recipes`, {
+    headers: headers(), data: { title: 'Starszy przepis odczytywany QA', instructions: ['Własny starszy krok.'], ingredients: [{ name: 'składnik', amount: null, unit: 'unknown', weight_state: 'unknown' }], rights_attestation: 'i_am_author' },
+  });
+  expect(existingResponse.status()).toBe(201);
+  const existing = await existingResponse.json();
+  await page.reload();
+  await expect(page.getByRole('button', { name: `Otwórz ${existing.title}`, exact: true })).toBeVisible();
   const raw = rawDocument();
   ({ form, input } = await preview(page, hid, raw));
   const refreshed = page.waitForResponse((r) => r.request().method() === 'GET' && new URL(r.url()).pathname === '/api/v1/households');
@@ -140,8 +149,32 @@ test('explicit JSON-LD save preserves draft failures, original unknowns and immu
   expect((await refreshed).status()).toBe(200);
   await expect(input).toHaveValue(raw);
   await expect(page.getByTestId('jsonld-save')).toBeEnabled();
-  const savedResponse = await responseFor(page, 'POST', `${base}/recipe-imports`, () => page.getByTestId('jsonld-save').click(), 201);
-  const original = await savedResponse.json();
+  let releaseOld: () => void = () => undefined;
+  const oldGate = new Promise<void>((resolve) => { releaseOld = resolve; });
+  let readOld: (status: number) => void = () => undefined;
+  const oldReady = new Promise<number>((resolve) => { readOld = resolve; });
+  const oldPath = `${base}/recipes/${existing.id}`;
+  const oldMatcher = `**${oldPath}`;
+  await page.route(oldMatcher, async (route) => {
+    const response = await route.fetch(); readOld(response.status());
+    await oldGate; await route.fulfill({ response });
+  });
+  const original = await (async () => {
+    try {
+      await page.getByRole('button', { name: `Otwórz ${existing.title}`, exact: true }).click();
+      expect(await oldReady).toBe(200);
+      const savedResponse = await responseFor(page, 'POST', `${base}/recipe-imports`, () => page.getByTestId('jsonld-save').click(), 201);
+      const imported = await savedResponse.json();
+      await expect(page.getByTestId('recipe-detail')).toHaveAttribute('data-recipe-id', imported.id);
+      const deliveredOld = page.waitForResponse((r) => r.request().method() === 'GET' && new URL(r.url()).pathname === oldPath);
+      releaseOld(); await (await deliveredOld).finished(); await page.waitForLoadState('networkidle');
+      await expect(page.getByTestId('recipe-detail')).toHaveAttribute('data-recipe-id', imported.id);
+      await expect(page.getByTestId('recipe-detail')).toContainText(imported.title);
+      await expect(page.getByTestId('jsonld-save-success')).toContainText(imported.title);
+      await expect(page.getByTestId('recipe-detail')).not.toContainText(existing.title);
+      return imported;
+    } finally { releaseOld(); await page.unroute(oldMatcher); }
+  })();
   await expect(page.getByTestId('jsonld-save-success')).toBeVisible();
   await expect(input).toBeDisabled();
   await expect(page.getByTestId('jsonld-save')).toHaveCount(0);
