@@ -82,7 +82,8 @@ def test_openapi_is_deterministic_and_excludes_unimplemented_domains() -> None:
     assert "/api/v1/households/{household_id}/recipes" in specification["paths"]
     assert not any("plans" in path for path in specification["paths"])
     assert {path for path in specification["paths"] if "imports" in path} == {
-        "/api/v1/households/{household_id}/recipe-imports/preview"
+        "/api/v1/households/{household_id}/recipe-imports/preview",
+        "/api/v1/households/{household_id}/recipe-imports",
     }
     assert (
         "application/problem+json"
