@@ -223,6 +223,7 @@ function PrivateCatalog({ session, household }: { session: Session; household: H
   const [reload, setReload] = useState(0);
   const { refreshHouseholds } = useHousehold();
   const mounted = useMounted();
+  const detailRequest = useRef(0);
   useEffect(() => {
     let active = true;
     const generation = currentAuthGeneration();
@@ -237,23 +238,25 @@ function PrivateCatalog({ session, household }: { session: Session; household: H
   }, [household.id, after, limit, reload, refreshHouseholds]);
   async function open(id: string) {
     const generation = currentAuthGeneration();
+    const request = ++detailRequest.current;
     setBusy(true); setError(""); setSuccess(""); setRecipe(null); setCreating(false);
     try {
       const value = await api<Recipe>(`households/${household.id}/recipes/${id}`);
-      if (mounted.current && generation === currentAuthGeneration()) setRecipe(value);
+      if (mounted.current && generation === currentAuthGeneration() && request === detailRequest.current) setRecipe(value);
     } catch (problem) {
-      if (mounted.current && generation === currentAuthGeneration()) {
+      if (mounted.current && generation === currentAuthGeneration() && request === detailRequest.current) {
         setError(errorMessage(problem));
         if (problem instanceof ApiError && (problem.status === 403 || problem.status === 404)) await refreshHouseholds().catch(() => {});
       }
-    } finally { if (mounted.current && generation === currentAuthGeneration()) setBusy(false); }
+    } finally { if (mounted.current && generation === currentAuthGeneration() && request === detailRequest.current) setBusy(false); }
   }
-  function move(next: string | null, previousPages: (string | null)[]) { setPage(null); setAfter(next); setPages(previousPages); setRecipe(null); setCreating(false); setSuccess(""); setError(""); }
+  function invalidateDetailRequest() { detailRequest.current += 1; setBusy(false); }
+  function move(next: string | null, previousPages: (string | null)[]) { invalidateDetailRequest(); setPage(null); setAfter(next); setPages(previousPages); setRecipe(null); setCreating(false); setSuccess(""); setError(""); }
   function refreshList() { setError(""); setPage(null); setReload((value) => value + 1); }
   return <div className="household-stack">
     <section className="form-card">
       <div className="card-heading"><h2>Przepisy w Waszej kuchni</h2><div className="form-actions">
-        {household.capabilities.can_edit && <button className="button" type="button" disabled={busy} onClick={() => { setCreating(true); setRecipe(null); setError(""); setSuccess(""); }}>Dodaj własny przepis</button>}
+        {household.capabilities.can_edit && <button className="button" type="button" disabled={busy} onClick={() => { invalidateDetailRequest(); setCreating(true); setRecipe(null); setError(""); setSuccess(""); }}>Dodaj własny przepis</button>}
         <button className="secondary-button" type="button" disabled={busy} onClick={refreshList}>Odśwież katalog</button>
       </div></div>
       {!household.capabilities.can_edit && <p className="note">Masz dostęp do podglądu. Przepisy edytuje właściciel lub edytor.</p>}
@@ -271,9 +274,9 @@ function PrivateCatalog({ session, household }: { session: Session; household: H
         <div className="pagination"><button className="secondary-button" type="button" disabled={busy || pages.length === 0} onClick={() => move(pages.at(-1) ?? null, pages.slice(0, -1))}>Poprzednia strona</button><button data-testid="recipe-list-next" className="secondary-button" type="button" disabled={busy || page.next_cursor === null} onClick={() => move(page.next_cursor, [...pages, after])}>Następna strona</button></div>
       </>}
     </section>
-    {creating && household.capabilities.can_edit && <RecipeForm key="recipe-create-form" session={session} householdId={household.id} onCancel={() => setCreating(false)} onSaved={(result) => { setCreating(false); setRecipe(result); setSuccess("Przepis zapisany i potwierdzony przez serwer."); refreshList(); }} />}
-    {recipe && <RecipeDetail key={`recipe-detail-${recipe.id}`} session={session} household={household} recipe={recipe} onClose={() => setRecipe(null)} onSaved={refreshList} />}
-    <JsonldPreview key={`jsonld-${session.user.id}-${household.id}`} household={household} session={session} onImported={(imported) => { setCreating(false); setRecipe(imported); setSuccess("Szkic z własnego JSON-LD zapisany i potwierdzony przez serwer."); refreshList(); }} />
+    {creating && household.capabilities.can_edit && <RecipeForm key="recipe-create-form" session={session} householdId={household.id} onCancel={() => setCreating(false)} onSaved={(result) => { invalidateDetailRequest(); setCreating(false); setRecipe(result); setSuccess("Przepis zapisany i potwierdzony przez serwer."); refreshList(); }} />}
+    {recipe && <RecipeDetail key={`recipe-detail-${recipe.id}`} session={session} household={household} recipe={recipe} onClose={() => { invalidateDetailRequest(); setRecipe(null); }} onSaved={refreshList} />}
+    <JsonldPreview key={`jsonld-${session.user.id}-${household.id}`} household={household} session={session} onImported={(imported) => { invalidateDetailRequest(); setCreating(false); setRecipe(imported); setSuccess("Szkic z własnego JSON-LD zapisany i potwierdzony przez serwer."); refreshList(); }} />
   </div>;
 }
 export function RecipesScreen() {
