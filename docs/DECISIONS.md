@@ -24,3 +24,5 @@ Przyjęte decyzje architektury; każdą istotną zmianę dokumentuj nowym ADR.
 - [0016 Private recipe snapshots and explicit demo](ADR/0016-private-recipe-snapshots-and-demo.md)
 
 - [0017 Private link-only recipe bookmarks](ADR/0017-private-link-only-bookmarks.md)
+
+- [0018 Bounded private own JSON-LD preview](ADR/0018-bounded-private-jsonld-preview.md)

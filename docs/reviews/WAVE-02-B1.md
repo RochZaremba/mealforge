@@ -1,0 +1,9 @@
+# W02-B1 review — transient own JSON-LD preview
+
+Scope ADR0018; root takes exclusive implementation after specialized implementation agents' resource-credit failures. Their read-only preflight constraints retained: strict decoder budgets/duplicate keys/nonfinite/surrogates; no network or context expansion; own-author rights only; literal ingredients/yield/steps; unknown nutrients/allergens/storage/license/planner exclusion; no fake provenance through manual-save mapping. B2 persistence remains separate and unimplemented.
+
+Independent reviewer SOURCE PASS on source atop mergeddb2d5ab: reviewed parser, authenticated endpoint, proxy method allowlist and keyed UI. Personally reran50pure tests PASS0.14s. No concrete P0–P2 blocker in examined source. No database writes in preview; current household write authorization and CSRF precede parsing; mounted/auth/household/capability guards protect delayed results. Reviewer remains required for final local evidence before merge.
+
+Root actual53newAPI/parser tests PASS4.99s; populated existing recipe/version/profile target snapshot retest3PASS5.88s. Static44sourcefiles/productionbuild/Docker PASS. Full30browser PASS38.5s including mobile390/desktop1440 literal markup/no assets/yieldunknown/error draft/focus and lateAresponse underB; whole previous28 scenarios retained. Root personally viewed both original evidence; screenshot harness now scrolls to top for stable fixed navigation. Populated encrypted15-table2961-row restore/privacy/resources PASS.
+
+Feedback: parser-version Literal default corrected after mypy; obsolete health test updated to allow only implemented preview while denying future import/planner endpoints. First combined299PASS/1obsolete assertion failure169.81s; correctedhealth12PASS2.00s, final300 rerun pending. Final targeted2browser/cache/evidence, local acceptance and exact CI pending. No waiver, no fullW02 completion or production deployment.

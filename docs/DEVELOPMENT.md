@@ -67,8 +67,12 @@ The separate demo button requires explicit confirmation. It creates a new owned 
 
 `make recipe-fixture-test` requires running Docker and verifies the original root fixture, installed API resource, audited server loader and actual API container equality. Missing or altered runtime originals fail demo creation atomically. Use IMPLEMENTATION_STATUS and TEST_REPORT for actual integration/CI/merge gates. W02 nutrition, W03 planning and later kitchen/offline functions are not completed.
 
-## Private source links W02-A (local gates passed; final CI/merge pending)
+## Private source links W02-A (PR5 merged; gates passed)
 
 On /recipes, select a household and use “Dodaj link”. Supply an HTTPS address, your own title and optional own note; confirm authorship only of your contribution. The server saves an immutable private bookmark. Viewer can read details; only editor/owner can save. Lists have bounded pagination. Source opens only after the explicit link click, with no page previews or background fetching. No edit/delete controls exist in A.
 
 Saving a URL does not create a recipe, determine nutrition/allergens/storage or grant import rights. Known source IDs merely classify exact domains. The opening URL keeps its fragment; deduplication ignores it. Source-registry check dates come from the packaged configuration, not a new Terms audit. `make source-registry-test` compares repository/installed registry with the audited loader in the actual Docker API; tampered resources fail closed. Full W02 parser, nutrition calculation and provider adapters remain future slices.
+
+## Own JSON-LD preview W02-B1 (final acceptance in progress)
+
+On /recipes, editor/owner opens “Podgląd własnego JSON-LD”, pastes one own recipe JSON with a title, text ingredient list and inline instructions, confirms authorship of the whole supplied recipe, then requests a real server preview. Raw HTML, multiple recipes, reference-only instructions, nonfinite numbers or over-budget input fail safely. This is a transient preview, not a save. Literal text remains escaped; images, links and contexts are not fetched. Quantity/unit/state, nutrition/allergens, yield mass/servings and storage remain unverified. Document stays in scoped memory and clears when that form/household/auth context unmounts. Persisted import origin and recipe creation follow in B2; no hidden write or new database schema.
