@@ -152,7 +152,7 @@ Opening URL preserves fragments, query order and encoded separators. Canonical U
 
 ## W02-B1 own JSON-LD preview (PR6 merged; gates passed)
 
-POST `/households/{id}/recipe-imports/preview`: editor/owner, session, trusted Origin, JSON and CSRF; strict `{document: string, rights_attestation: "i_am_author"}`. Document<=12288UTF8bytes; outer body<=16KiB. This is a transient read computation: no idempotency requirement/record, audit write, recipe creation or persisted source. No other import route is implemented.
+POST `/households/{id}/recipe-imports/preview`: editor/owner, session, trusted Origin, JSON and CSRF; strict `{document: string, rights_attestation: "i_am_author"}`. Document<=12288UTF8bytes; outer body<=16KiB. This is a transient read computation: no idempotency requirement/record, audit write, recipe creation or persisted source. B1 implemented only this preview; the separate B2 save contract is described below.
 
 200 response: title, literal ingredient texts with `amount:null/unit:unknown/weight_state:unknown`, instruction texts and section paths, unverified `recipe_yield_raw` strings, source SHA256/parser_version, fixed ignored-field names, `source_mode:user_supplied_jsonld`, `rights_mode:private_user_content`, license null, nutrition/allergens unknown, draft status, planner false and `persisted:false`. Field names from JSON-LD do not grant rights, resolve references, convert units or verify nutrition/storage. Missing/malformed/ambiguous/unsupported content returns sanitized422 `JSONLD_INVALID`; unknown input fields/author attestation422, viewer403, foreign/revoked404; no-store on all responses. Preview is not the future persisted recipe-import contract in contracts/recipe-import.schema.json; B2 will extend provenance explicitly.
 
