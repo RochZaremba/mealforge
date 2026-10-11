@@ -11,3 +11,5 @@ Scope: ADR0017 and W02-A execution plan. Root integrated API/source policy/UI/in
 Feedback: frontend now trims surrounding pasted URL whitespace before sending and measures the actual transmitted UTF-8 bytes; API remains strict. No findings are waived. Final browser/backup/privacy/exact-head CI and merge evidence must be appended before declaring A complete.
 
 Final LOCAL gate PASS at8e4dbb19ec6b3a0795655a2d4902cbabe8e2d181: root247API142.50s/no skips,28mobile/desktop browser27.0s, migrations/static/Docker resources and populated15-table2110-row restore/privacy all PASS. Reviewer/QA/security personally inspected logs and both synthetic screenshots. Security additionally confirmed all8 stored full source URLs and nontrivial notes absent from actual API/web/PostgreSQL logs (values never printed). No open P0–P2 in reviewed A scope. Exact final documented-head GitHub Actions and merge remain required; full W02 is not complete.
+
+Gate CLOSED: PR5 mergeddb2d5abaccaf46f3da4fe4ac7d025a491fe174e3 at2026-10-11T09:33:26Z, exact4c81b0b90f2e6a98618edf07e78bfa3c82fc59ed Actions38092376097/38092372971 SUCCESS includingcleanup. A COMPLETE; no production deployment.

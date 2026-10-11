@@ -134,7 +134,7 @@ Server-owned provenance distinguishes `original_fixture` text by MealForge (`CC0
 
 Demo requires the audited runtime fixture and creates two resident profiles (2700/1600 kcal, every macro null), five meal slots and three draft recipes in the same transaction. Missing or changed fixture aborts with 503, without partial household creation. Household DTO adds `source: user_created|demo_seed`; target DTO adds `source: user_set|demo_seed` and demo warnings. Legacy stored responses default only to their known pre-demo source semantics, preserving idempotent replay compatibility.
 
-## W02-A link-only contract (local gates passed; final CI/merge pending)
+## W02-A link-only contract (PR5 merged; gates passed)
 
 Authenticated household routes retain current authorization, private `no-store` responses and existing 16 KiB request bounds. POST requires editor/owner, trusted Origin, JSON, CSRF and UUID Idempotency-Key. Viewer may read; revoked access cannot read or replay a write.
 
@@ -149,3 +149,9 @@ LinkInput: `user_title` (1–160 characters), `source_url` (strict HTTPS URL, up
 Summary: `id`, `household_id`, `user_title`, `source_url`, `host`, nullable `source_id`, `source_registry_checked_at`, `created_at`, `version: 1`, `status: "link_only"`, `planner_eligible: false`, `license: null`, `automatic_fetch_enabled: false`, `nutrition_status: "unknown"`, `allergen_status: "unknown"`. Detail additionally contains `canonical_url`, `own_note`, `own_contribution_attestation` and `actor_user_id`. Summaries omit notes. Registry date is the packaged configuration's historical check date; recognition of a domain grants no rights or network permission.
 
 Opening URL preserves fragments, query order and encoded separators. Canonical URL removes only the fragment for deduplication after safe scheme/host/default-port normalization. Unsafe numeric/local hosts, credentials, non-443 ports, raw whitespace/control/backslashes, encoded controls, malformed percent encoding, domain-changing IDNA mappings and browser dot segments are rejected. Validation performs neither DNS nor HTTP; a syntactically allowed domain is not evidence of public resolution or permission for future fetching. No edit/delete/import endpoints exist in A. Missing or changed packaged registry aborts creation atomically with 503 `SOURCE_REGISTRY_UNAVAILABLE`.
+
+## W02-B1 own JSON-LD preview (local gates passed; final documented-head CI pending)
+
+POST `/households/{id}/recipe-imports/preview`: editor/owner, session, trusted Origin, JSON and CSRF; strict `{document: string, rights_attestation: "i_am_author"}`. Document<=12288UTF8bytes; outer body<=16KiB. This is a transient read computation: no idempotency requirement/record, audit write, recipe creation or persisted source. No other import route is implemented.
+
+200 response: title, literal ingredient texts with `amount:null/unit:unknown/weight_state:unknown`, instruction texts and section paths, unverified `recipe_yield_raw` strings, source SHA256/parser_version, fixed ignored-field names, `source_mode:user_supplied_jsonld`, `rights_mode:private_user_content`, license null, nutrition/allergens unknown, draft status, planner false and `persisted:false`. Field names from JSON-LD do not grant rights, resolve references, convert units or verify nutrition/storage. Missing/malformed/ambiguous/unsupported content returns sanitized422 `JSONLD_INVALID`; unknown input fields/author attestation422, viewer403, foreign/revoked404; no-store on all responses. Preview is not the future persisted recipe-import contract in contracts/recipe-import.schema.json; B2 will extend provenance explicitly.
