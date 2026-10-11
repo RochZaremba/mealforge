@@ -86,3 +86,19 @@ two sample 2700/1600 targets with null macros, five slots and three original dra
 It never modifies another household. `source=demo_seed` and demo warnings persist
 on household/target DTOs. The audited original fixture ships as an installed package
 resource; absence, excessive size or integrity drift aborts demo creation atomically.
+
+W02-A adds private create-only source bookmarks at
+`/api/v1/households/{id}/recipe-links`. A user's own label/note and contribution
+attestation are stored with a validated HTTPS opening URL, preserving its fragment.
+The canonical deduplication URL removes only the fragment; household duplicates
+with a new operation key return `409 RECIPE_LINK_EXISTS`. Same-key replay rechecks
+current edit access and returns the original record. Immutable rows and bounded
+2048-byte URLs are enforced by PostgreSQL; lists use `limit` 1–20 and `after` UUID.
+
+URL validation is pure and performs no DNS, redirects or network request. Registry
+classification is frozen metadata, not source rights approval. Every record stays
+`link_only`, license unknown, nutrition/allergens unknown, automatic fetch disabled
+and excluded from planning. User notes do not become structured nutrition/safety
+claims. The complete source registry ships in the installed package with bounded
+integrity-checked loading; absence or drift aborts creation. There is no edit,
+delete, remote preview, parser or automatic import in this slice.

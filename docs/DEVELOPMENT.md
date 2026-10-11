@@ -59,10 +59,16 @@ make backup-test now compares every public table using an exported consistent sn
 ## Invitations W01-B (PR #3 merged)
 On /household the owner selects an existing non-login resident and editor/viewer access, creates a 24-hour single-use code and passes it privately. The recipient registers/logs in on their own account and enters the code in the join form. No email is sent. Owner-only account controls can revoke or restore access; resident participation, targets and history remain. Viewer sees profiles and slots without edit controls. The canonical owner cannot be demoted or revoked. Codes stay in ephemeral memory and JSON bodies, with no URL or persistent browser storage.
 
-## Private recipes W01-C (PR #4 final CI pending)
+## Private recipes W01-C (PR #4 merged; gates passed)
 
 Open /recipes after logging in. The current household selection is shared with /household and Today, retained only in memory and rechecked with the server. Create a private recipe by declaring ingredient amounts/units/states, writing your own instructions and confirming authorship of your contribution. Edits append immutable versions; history and list pages are reachable. Empty amount means unknown, not zero. Recipes remain drafts with unknown nutrition/allergens/yield/storage and cannot enter a planner.
 
 The separate demo button requires explicit confirmation. It creates a new owned household with two sample targets2700/1600 (all macros unknown), five slots and three original MealForge drafts. No demo is seeded by startup, signup or real household creation. Existing real goals/history remain unchanged. Original text is CC0 only within its declared scope; new private user edits have unknown license and retain original attribution. No external recipe fetch is activated.
 
 `make recipe-fixture-test` requires running Docker and verifies the original root fixture, installed API resource, audited server loader and actual API container equality. Missing or altered runtime originals fail demo creation atomically. Use IMPLEMENTATION_STATUS and TEST_REPORT for actual integration/CI/merge gates. W02 nutrition, W03 planning and later kitchen/offline functions are not completed.
+
+## Private source links W02-A (local gates passed; final CI/merge pending)
+
+On /recipes, select a household and use “Dodaj link”. Supply an HTTPS address, your own title and optional own note; confirm authorship only of your contribution. The server saves an immutable private bookmark. Viewer can read details; only editor/owner can save. Lists have bounded pagination. Source opens only after the explicit link click, with no page previews or background fetching. No edit/delete controls exist in A.
+
+Saving a URL does not create a recipe, determine nutrition/allergens/storage or grant import rights. Known source IDs merely classify exact domains. The opening URL keeps its fragment; deduplication ignores it. Source-registry check dates come from the packaged configuration, not a new Terms audit. `make source-registry-test` compares repository/installed registry with the audited loader in the actual Docker API; tampered resources fail closed. Full W02 parser, nutrition calculation and provider adapters remain future slices.

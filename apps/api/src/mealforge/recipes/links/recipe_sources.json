@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-10",
+  "default_mode": "link_only",
+  "default_automatic_fetch": false,
+  "require_per_source_approval": true,
+  "sources": [
+    {
+      "id": "mealime",
+      "kind": "recipe_website",
+      "domains": [
+        "mealime.com",
+        "www.mealime.com"
+      ],
+      "homepage": "https://www.mealime.com/recipes",
+      "access_mode": "link_only",
+      "automatic_fetch_enabled": false,
+      "terms_url": "https://www.mealime.com/terms-of-service",
+      "license": "all_rights_reserved_or_not_verified",
+      "requires_human_rights_review": true,
+      "notes": "Automated scraping explicitly prohibited without owner authorization; announced shutdown 2026-10-21.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "aniagotuje",
+      "kind": "recipe_website",
+      "domains": [
+        "aniagotuje.pl",
+        "www.aniagotuje.pl"
+      ],
+      "homepage": "https://aniagotuje.pl/",
+      "access_mode": "link_only",
+      "automatic_fetch_enabled": false,
+      "terms_url": "https://aniagotuje.pl/przepis/fasolka-po-bretonsku",
+      "license": "all_rights_reserved_or_not_verified",
+      "requires_human_rights_review": true,
+      "notes": "Text/image copying prohibited; no verified API license.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "kwestiasmaku",
+      "kind": "recipe_website",
+      "domains": [
+        "kwestiasmaku.com",
+        "www.kwestiasmaku.com"
+      ],
+      "homepage": "https://www.kwestiasmaku.com/",
+      "access_mode": "link_only",
+      "automatic_fetch_enabled": false,
+      "terms_url": "https://www.kwestiasmaku.com/regulamin-i-polityka-prywatnosci",
+      "license": "all_rights_reserved_or_not_verified",
+      "requires_human_rights_review": true,
+      "notes": "Website asserts rights and forbids unauthorized copying/distribution.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "mojewypieki",
+      "kind": "recipe_website",
+      "domains": [
+        "mojewypieki.com",
+        "www.mojewypieki.com"
+      ],
+      "homepage": "https://mojewypieki.com/",
+      "access_mode": "link_only",
+      "automatic_fetch_enabled": false,
+      "terms_url": null,
+      "license": "all_rights_reserved_or_not_verified",
+      "requires_human_rights_review": true,
+      "notes": "Terms and acquisition rights not yet independently approved.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "jadlonomia",
+      "kind": "recipe_website",
+      "domains": [
+        "jadlonomia.com",
+        "www.jadlonomia.com"
+      ],
+      "homepage": "https://www.jadlonomia.com/",
+      "access_mode": "link_only",
+      "automatic_fetch_enabled": false,
+      "terms_url": null,
+      "license": "all_rights_reserved_or_not_verified",
+      "requires_human_rights_review": true,
+      "notes": "Terms and acquisition rights not yet independently approved.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "przepisy_pl",
+      "kind": "recipe_website",
+      "domains": [
+        "przepisy.pl",
+        "www.przepisy.pl"
+      ],
+      "homepage": "https://www.przepisy.pl/",
+      "access_mode": "link_only",
+      "automatic_fetch_enabled": false,
+      "terms_url": null,
+      "license": "all_rights_reserved_or_not_verified",
+      "requires_human_rights_review": true,
+      "notes": "Terms and acquisition rights not yet independently approved.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "kuchnialidla",
+      "kind": "recipe_website",
+      "domains": [
+        "kuchnialidla.pl",
+        "www.kuchnialidla.pl"
+      ],
+      "homepage": "https://kuchnialidla.pl/",
+      "access_mode": "link_only",
+      "automatic_fetch_enabled": false,
+      "terms_url": null,
+      "license": "all_rights_reserved_or_not_verified",
+      "requires_human_rights_review": true,
+      "notes": "Terms and acquisition rights not yet independently approved.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "bbcgoodfood",
+      "kind": "recipe_website",
+      "domains": [
+        "bbcgoodfood.com",
+        "www.bbcgoodfood.com"
+      ],
+      "homepage": "https://www.bbcgoodfood.com/",
+      "access_mode": "link_only",
+      "automatic_fetch_enabled": false,
+      "terms_url": null,
+      "license": "all_rights_reserved_or_not_verified",
+      "requires_human_rights_review": true,
+      "notes": "Terms and acquisition rights not yet independently approved.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "allrecipes",
+      "kind": "recipe_website",
+      "domains": [
+        "allrecipes.com",
+        "www.allrecipes.com"
+      ],
+      "homepage": "https://www.allrecipes.com/",
+      "access_mode": "link_only",
+      "automatic_fetch_enabled": false,
+      "terms_url": null,
+      "license": "all_rights_reserved_or_not_verified",
+      "requires_human_rights_review": true,
+      "notes": "Terms and acquisition rights not yet independently approved.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "themealdb",
+      "kind": "recipe_api",
+      "domains": [
+        "www.themealdb.com",
+        "themealdb.com"
+      ],
+      "homepage": "https://www.themealdb.com/api.php",
+      "access_mode": "authorized_api",
+      "automatic_fetch_enabled": false,
+      "terms_url": "https://www.themealdb.com/terms_of_use.php",
+      "license": "provider_terms",
+      "requires_human_rights_review": true,
+      "notes": "Official API endpoints, API content reuse subject to notices. Test key 1 for development; public app store needs paid supporter key. Do not scrape HTML site.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "wikibooks",
+      "kind": "open_recipe_content",
+      "domains": [
+        "en.wikibooks.org"
+      ],
+      "homepage": "https://en.wikibooks.org/wiki/Cookbook:Recipes",
+      "access_mode": "authorized_api",
+      "automatic_fetch_enabled": false,
+      "terms_url": "https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use",
+      "license": "check_page_version_CC-BY-SA",
+      "requires_human_rights_review": true,
+      "notes": "Wikimedia API, attribution/share-alike, individual media licenses. Review before enabling.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "usda_fdc",
+      "kind": "nutrition_api",
+      "domains": [
+        "api.nal.usda.gov"
+      ],
+      "homepage": "https://fdc.nal.usda.gov/api-guide/",
+      "access_mode": "authorized_api",
+      "automatic_fetch_enabled": false,
+      "terms_url": "https://fdc.nal.usda.gov/api-guide/",
+      "license": "CC0",
+      "requires_human_rights_review": false,
+      "notes": "Optional API key; 1000 req/hour default; nutrition only, not recipe catalog.",
+      "verified_as_of": "2026-10-10"
+    },
+    {
+      "id": "openfoodfacts",
+      "kind": "barcode_product_api",
+      "domains": [
+        "world.openfoodfacts.org"
+      ],
+      "homepage": "https://world.openfoodfacts.org/",
+      "access_mode": "authorized_api",
+      "automatic_fetch_enabled": false,
+      "terms_url": "https://support.openfoodfacts.org/help/en-gb/12-donnees-api/94-y-a-t-il-des-conditions-pour-utiliser-l-api",
+      "license": "ODbL+image_CC-BY-SA",
+      "requires_human_rights_review": true,
+      "notes": "Custom User-Agent, rate limits, share-alike database mixing obligations; products not recipe corpus.",
+      "verified_as_of": "2026-10-10"
+    }
+  ]
+}

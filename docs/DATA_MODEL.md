@@ -83,7 +83,7 @@ Migration0003 adds `household_members.access_enabled` (default true) and `access
 
 Acceptance, access changes and private household operations serialize on the same household lock before invitation/member locks. Locked ORM reloads must refresh preloaded objects to avoid stale role or invitation status after concurrent revocation. Acceptance atomically links a resident, consumes the invitation, writes metadata-only audit and records idempotency. Session revocation and current authorization checks also apply on replay. Tests must prove single use across distinct accounts and preservation of the existing resident profile.
 
-## W01-C schema (integration and verification pending)
+## W01-C schema (PR #4 merged; gates passed)
 
 Migration0004 adds `households.source` with `user_created` for existing households and explicit `demo_seed` only for opt-in demo creation. Recipe identities in `recipes` carry UUID, household, current revision and timestamp. `recipe_versions` store scoped recipe UUID, positive version, acting user, timestamp and a Pydantic-validated JSONB snapshot. Snapshots preserve exact Decimal strings and unknown values; they do not claim normalized ingredient identities or verified nutrition. The deployed C schema is deliberately narrower than the future normalized recipe model above.
 
@@ -92,3 +92,11 @@ Recipe version `(recipe_id, household_id, version)` is unique. A composite FK fr
 Recipe mutations write metadata-only audit and idempotency records in the same transaction; retries store references, reauthorize current membership and return the original committed version, even after later edits. Demo creation uses global authenticated-user scope, then current owner authorization on replay. All demo profiles, five slots and three recipe versions commit together. Normal household creation and startup never seed targets or recipes. Nutrition profile source already supports the explicit `demo_seed` value; existing user targets/history remain unchanged.
 
 Trusted original provenance comes exclusively from the packaged, bounded, audited fixture. Edited snapshots retain finite original attribution and a source-version reference, without copying an unbounded chain of historical snapshots. New user contributions have private rights with unknown license. No external recipe source adapter or fetch job is introduced.
+
+## W02-A schema (local gates passed; final CI/merge pending)
+
+Migration0005 adds separate `recipe_links`: UUID, household/user foreign keys, creation timestamp, validated opening `source_url`, deduplication `canonical_url`, ASCII host, nullable source ID, historical registry check date, own title/note and narrow authorship declaration. A bookmark creates no recipe, recipe version, ingredient identity or nutrition profile.
+
+Unique `(household_id, canonical_url)` and a shared household transaction lock prevent concurrent duplicate creation. PostgreSQL enforces both URL byte bounds (2048), version1, `status=link_only`, unknown license, planner/fetch disabled and the declaration literal. The existing immutable-history trigger rejects UPDATE/DELETE, including notes. This create-only slice has no mutation history to undo; later edit/delete behavior requires its own contract.
+
+Creation, metadata-only audit and reference-only idempotency result commit atomically. Raw URLs/notes are absent from audit/idempotency JSON. Current membership is reauthorized before replay. The packaged registry is bounded, digest-audited and compared against repository configuration in CI and the running Docker API; classification never activates any adapter. Source information is frozen at creation, preserving its configured check date rather than claiming a new Terms review.

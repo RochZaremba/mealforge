@@ -1,4 +1,4 @@
-.PHONY: help init-env validate-kit deps install dev dev-local stop test lint typecheck e2e migrate seed migration-test openapi check-contract build backup backup-test privacy-test recipe-fixture-test
+.PHONY: help init-env validate-kit deps install dev dev-local stop test lint typecheck e2e migrate seed migration-test openapi check-contract build backup backup-test privacy-test recipe-fixture-test source-registry-test
 UV ?= uv
 PNPM ?= pnpm
 COMPOSE = docker compose --env-file .env -f compose.dev.yml
@@ -32,6 +32,7 @@ test:
 	python3 scripts/test_backup_integrity.py
 	$(UV) run --directory apps/api python ../../scripts/test_nutrition_contract.py
 	$(UV) run --directory apps/api python ../../scripts/check_original_recipes.py
+	$(UV) run --directory apps/api python ../../scripts/check_recipe_sources.py
 lint:
 	$(UV) run --directory apps/api ruff check .
 	$(PNPM) lint
@@ -54,3 +55,6 @@ privacy-test:
 
 recipe-fixture-test:
 	$(UV) run --project apps/api --env-file .env python scripts/check_original_recipes.py --docker
+
+source-registry-test:
+	$(UV) run --project apps/api --env-file .env python scripts/check_recipe_sources.py --docker

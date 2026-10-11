@@ -17,6 +17,7 @@ from mealforge.households.invitations import router as invitations_router
 from mealforge.households.routes import router as household_router
 from mealforge.identity.routes import router as identity_router
 from mealforge.recipes.demo import router as demo_router
+from mealforge.recipes.links.routes import router as recipe_links_router
 from mealforge.recipes.routes import router as recipe_router
 
 
@@ -58,6 +59,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(household_router)
     application.include_router(invitations_router)
     application.include_router(recipe_router)
+    application.include_router(recipe_links_router)
 
     @application.exception_handler(ApiError)
     async def api_error(request: Request, exc: ApiError) -> JSONResponse:

@@ -1,4 +1,4 @@
-# Test report — 2026-10-10
+# Test report — 2026-10-11
 
 | Wave | Command | Exit | Actual result |
 |---|---|---|---|
@@ -128,3 +128,23 @@ W01-B final exact-headd650dd006ea62701ff2ef1bd4cd0b6442401c365 CI PASS: Actions3
 - Final root `PLAYWRIGHT_NO_SERVER=1 make e2e`: exit0,24passed27.1s, official bundled Chromium against actual C Docker; all16A/B/W00regressions and8Ccases. Initial Actions38090886410/38090835457 onca45423 failed the same nested textarea selector (logs confirmed); subsequentc880c5b CI and final documented head remain the merge gate. No checks skipped or production deployed.
 
 - Independent reviewer LOCAL integration PASSc880c5b after viewing mobile detail/pagination and desktop detail/viewer; production source70127bf unchanged by harness fix. Lead accepts the local gate. Final documented-head Actions including cleanup remain required before merge.
+
+W01-C final gate: exact13c1c834b5d3ea1484830fe1aa8af9fb08382d2f Actions38091280517+38091277922 SUCCESS, including120API/24E2E and cleanup. PR4 mergedc3f58ee7721595a21318b7ca71437ec1c91fd13f at2026-10-10T22:28:11Z (2026-10-11 Europe/Warsaw). WholeW01 COMPLETE. W02 has no runtime implementation yet; after main pull `make validate-kit`: exit0,154passed/0failed/0skipped before new contracts.
+
+## W02-A integrated gate (in progress)
+
+- `uv sync --directory apps/api --frozen; make validate-kit openapi`: exit0;156kit checks/no skips, generated actual OpenAPI includes link routes/strict DTOs.
+- `make lint typecheck check-contract build`: exit0; Ruff/eslint, mypy42files, tsc, exact schema drift and Next production11routes PASS. Owned new browser lint/typecheck also PASS.
+- `uv run --directory apps/api python ../../scripts/check_recipe_sources.py`: exit0; installed registry equals root and audited loader. Additional actual script probes reject modified package, changed loader and enabled-fetch configuration without exposing data.
+- `make dev`: exit0;3healthy Docker services, actual migration0005. `make source-registry-test recipe-fixture-test`: exit0; actual container registry and original recipes equal installed/root resources, all external fetch remains disabled.
+- Backend isolated full regression245tests PASS123.45s; this run collected older27QA cases. Latest independentQA29tests separately PASS29.46s. Root combined247tests/migration round-trip currently running; no success claimed yet.
+- Independent source/security/nutrition/integrations checks in `docs/reviews/WAVE-02-A.md`; root real28mobile/desktop browser cases, populated15-table restore/privacy and exact-head CI still pending. No production deployment; parser/nutrition/provider functionality not implemented in A.
+
+### W02-A final local feedback loop
+
+- `make test migration-test`: exit0; **247pytest PASS142.50s/no skips**, backup integrity1 and nutrition contract4 PASS, both installed registry/original fixtures PASS. Actual disposable up/check/seed twice/down/up/check/schema equality PASS.
+- `docker compose ... up --build -d --wait web`: exit0 after small URL.trim() form correction; final actual production Docker API0005/web healthy. `pnpm lint; pnpm typecheck`: exit0 on integrated browser/trim source.
+- `PLAYWRIGHT_NO_SERVER=1 make e2e`: exit0; **28tests PASS27.0s**, official bundled Chrome,1440×900 and390×844. Full W01 regressions plus source-link save/reload/pagination, literal/XSS-shaped note, unsafe private-host422 retaining draft, viewer403/revoke404, no remote requests or private cache, delayed committed A201 cannot populate selected B.
+- Root and independent reviewer personally viewed synthetic mobile/desktop screenshots now in `docs/evidence/wave-02-a`. No horizontal overflow or JS errors in scenarios. UI clearly states unknown nutrients/allergens, excluded planner and source rights unknown.
+- `make backup-test privacy-test`: exit0; actual consistent exported snapshot → authenticated encrypted pg_dump → verified decrypt → disposable pg_restore: **15tables/2110rows** fingerprints equal including real synthetic source-link rows. Bound private UNIQUE parameter absent from DB logs, actual generic error present. Temporary plaintext/backup/test DB removed.
+- Independent LOCAL reviewer PASS; source accepted at **8e4dbb19ec6b3a0795655a2d4902cbabe8e2d181** after actual browser/evidence review; no remaining P0–P2. Independent security/nutrition evidence above. PR5 https://github.com/RochZaremba/mealforge/pull/5 is draft until exact final documented-head GitHub Actions pass. Full W02 remains incomplete; no parser/nutrition/provider import or production deployment.

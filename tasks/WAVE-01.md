@@ -2,12 +2,12 @@
 
 - **Owner(s):** backend + frontend + qa
 - **Dependencies:** WAVE-00
-- **Status:** IN PROGRESS — A merged (PR #2); B merged (PR #3); C local120API/24E2E gate PASS, draft PR #4 final CI pending
+- **Status:** COMPLETE — A PR #2; B PR #3; C PR #4 mergedc3f58ee, exact13c1c83 CI PASS,120API/24E2E/14-table restore
 
 ## Implementation checklist
 
 - [x] Build password/session authentication, household membership and guest profile (no login for guest); A/B merged;83API/16E2E gate passed.
-- [x] Implement 2 sample members only as explicitly confirmed separate demo (2700 and 1600 kcal; all macro null), targets editable with history; actual C API/browser PASS, final CI/merge pending.
+- [x] Implement 2 sample members only as explicitly confirmed separate demo (2700 and 1600 kcal; all macro null), targets editable with history; actual C API/browser PASS, CI/merge PASS.
 - [x] Create 5 editable daily slot presets, repeat breakfast/dinner controls, Polish onboarding, mobile/desktop dashboard (A, real PostgreSQL and 390/1440 E2E).
 - [x] Three ORIGINAL recipe fixtures with13declared exact amounts and versioned user instructions; missing nutrient/allergen data visible as unknown; installed/Docker asset checks and actual API/browser PASS. These are drafts outside the planner.
 - [x] Household IDOR tests and profile warnings for kcal-macro inconsistency (A; exact Decimal and strict 5% boundary).
