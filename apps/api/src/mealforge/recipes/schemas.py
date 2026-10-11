@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator
 
 from mealforge.households.schemas import Energy, HouseholdResponse, Input, WarningResponse
 
@@ -83,8 +83,45 @@ class OriginalOrigin(BaseModel):
     attribution: str
 
 
+class ImportStep(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    text: str = Field(min_length=1, max_length=500)
+    section_path: list[Annotated[str, Field(min_length=1, max_length=160)]] = Field(max_length=8)
+
+
+class ImportOrigin(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    source_sha256: str = Field(min_length=64, max_length=64, pattern=r"^[0-9a-f]{64}$")
+    parser_version: Literal["jsonld-preview-v1"]
+    actor_user_id: UUID
+    imported_at: AwareDatetime
+    ingredients: list[Annotated[str, Field(min_length=1, max_length=160)]] = Field(
+        min_length=1, max_length=40
+    )
+    instructions: list[ImportStep] = Field(min_length=1, max_length=30)
+    recipe_yield_raw: list[Annotated[str, Field(min_length=1, max_length=500)]] = Field(
+        max_length=8
+    )
+    ignored_source_fields: list[
+        Literal[
+            "@context",
+            "@id",
+            "url",
+            "image",
+            "author",
+            "license",
+            "nutrition",
+            "prepTime",
+            "cookTime",
+            "totalTime",
+            "suitableForDiet",
+            "storageMethod",
+        ]
+    ] = Field(max_length=12)
+
+
 class Provenance(BaseModel):
-    source_mode: Literal["user_authored"]
+    source_mode: Literal["user_authored", "user_supplied_jsonld"]
     source_id: Literal["private_user_content", "original_fixture"]
     author: str
     rights_mode: Literal["private_user_content"]
@@ -94,6 +131,7 @@ class Provenance(BaseModel):
     rights_attestation: Literal["i_am_author"] | None
     source_version_id: UUID | None
     original_origin: OriginalOrigin | None
+    import_origin: ImportOrigin | None = None
 
 
 class RecipeSnapshot(BaseModel):
