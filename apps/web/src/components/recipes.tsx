@@ -51,6 +51,7 @@ function DemoCreate({ session }: { session: Session }) {
 }
 function RecipeContent({ recipe, historical = false }: { recipe: Recipe; historical?: boolean }) {
   const origin = recipe.provenance.original_origin;
+  const imported = recipe.provenance.import_origin;
   return <div className="recipe-content">
     <p className="form-warning">Szkic — wymaga sprawdzenia. Brak zweryfikowanych kalorii, makro i alergenów. Przepis nie jest jeszcze gotowy do planowania porcji.</p>
     <dl className="target-summary">
@@ -75,6 +76,21 @@ function RecipeContent({ recipe, historical = false }: { recipe: Recipe; histori
       {recipe.provenance.source_id === "original_fixture" ? <p>Oryginalny tekst MealForge · CC0-1.0, wyłącznie tekst przepisu.</p> : <p>Własny wkład: {recipe.provenance.author}. Treść prywatna; licencja nieznana.</p>}
       {recipe.provenance.attribution && <p className="note">{recipe.provenance.attribution}</p>}
       {origin && <p className="note">Baza oryginalnego tekstu: {origin.author} · {origin.license}, wyłącznie tekst przepisu. {origin.attribution} Własne zmiany pozostają prywatne z nieznaną licencją.</p>}
+      {imported && <>
+        <p className="note" data-testid="jsonld-current-source">{recipe.provenance.source_mode === "user_supplied_jsonld" ? "Ta wersja jest szkicem z własnego dokumentu JSON-LD." : "Ta wersja zawiera ręczne zmiany. Oryginalne dane importu poniżej pozostają bez zmian."}</p>
+        <details data-testid="jsonld-import-origin" className="jsonld-import-origin">
+          <summary>Oryginalne dane importu JSON-LD</summary>
+          <p className="note">To zapis oryginalnego zgłoszenia, a nie potwierdzenie aktualnych ilości lub instrukcji. Skrót identyfikuje dokument; nie potwierdza praw autorskich ani wartości odżywczych.</p>
+          <p className="note">Identyfikator dokumentu (SHA-256): <code data-testid="jsonld-source-sha256">{imported.source_sha256}</code></p>
+          <h4>Oryginalne zapisy składników</h4>
+          <ul>{imported.ingredients.map((item, index) => <li key={`import-ingredient-${index}`}>{item}</li>)}</ul>
+          <h4>Oryginalne instrukcje i sekcje</h4>
+          <ol>{imported.instructions.map((step, index) => <li key={`import-step-${index}`}>{step.section_path.length > 0 && <strong>{step.section_path.join(" / ")}: </strong>}{step.text}</li>)}</ol>
+          <h4>Deklaracja uzysku z oryginalnego dokumentu</h4>
+          {imported.recipe_yield_raw.length ? <ul>{imported.recipe_yield_raw.map((item, index) => <li key={`import-yield-${index}`}>{item}</li>)}</ul> : <p className="note">Nie podano.</p>}
+          <p className="note">To niezweryfikowany tekst. Nie określa zmierzonej masy dania, liczby osobowych porcji ani kaloryczności.</p>
+        </details>
+      </>}
     </section>
     {recipe.warnings.map((warning, index) => <p className="note" key={`warning-${warning.code}-${index}`}>{warning.message}</p>)}
   </div>;
@@ -214,8 +230,8 @@ function PrivateCatalog({ session, household }: { session: Session; household: H
       .then((result) => { if (active && generation === currentAuthGeneration()) setPage(result); })
       .catch((problem) => {
         if (!active || generation !== currentAuthGeneration()) return;
-        setPage(null); setRecipe(null); setCreating(false); setError(errorMessage(problem));
-        if (problem instanceof ApiError && (problem.status === 403 || problem.status === 404)) void refreshHouseholds().catch(() => {});
+        setPage(null); setError(errorMessage(problem));
+        if (problem instanceof ApiError && (problem.status === 403 || problem.status === 404)) { setRecipe(null); setCreating(false); void refreshHouseholds().catch(() => {}); }
       });
     return () => { active = false; };
   }, [household.id, after, limit, reload, refreshHouseholds]);
@@ -257,6 +273,7 @@ function PrivateCatalog({ session, household }: { session: Session; household: H
     </section>
     {creating && household.capabilities.can_edit && <RecipeForm key="recipe-create-form" session={session} householdId={household.id} onCancel={() => setCreating(false)} onSaved={(result) => { setCreating(false); setRecipe(result); setSuccess("Przepis zapisany i potwierdzony przez serwer."); refreshList(); }} />}
     {recipe && <RecipeDetail key={`recipe-detail-${recipe.id}`} session={session} household={household} recipe={recipe} onClose={() => setRecipe(null)} onSaved={refreshList} />}
+    <JsonldPreview key={`jsonld-${session.user.id}-${household.id}`} household={household} session={session} onImported={(imported) => { setCreating(false); setRecipe(imported); setSuccess("Szkic z własnego JSON-LD zapisany i potwierdzony przez serwer."); refreshList(); }} />
   </div>;
 }
 export function RecipesScreen() {
@@ -268,7 +285,7 @@ export function RecipesScreen() {
       <HouseholdSelector />
       {loading && <p role="status">Sprawdzanie gospodarstwa…</p>}
       {error && <section className="form-card"><Feedback error={error} /><button className="secondary-button" type="button" onClick={() => void refreshHouseholds().catch(() => {})}>Sprawdź gospodarstwa ponownie</button></section>}
-      {household ? <div hidden={loading || !!error} inert={loading || !!error}><PrivateCatalog key={`catalog-${session.user.id}-${household.id}`} household={household} session={session} /><RecipeLinks key={`recipe-links-${session.user.id}-${household.id}`} household={household} session={session} /><JsonldPreview key={`jsonld-${session.user.id}-${household.id}`} household={household} session={session} /></div> : !loading && !error && <section className="form-card"><h2>Wybierz swoją kuchnię</h2><p>Utwórz gospodarstwo albo zacznij od osobnego demo.</p><Link className="button" href="/household">Ustaw gospodarstwo</Link></section>}
+      {household ? <div hidden={loading || !!error} inert={loading || !!error}><PrivateCatalog key={`catalog-${session.user.id}-${household.id}`} household={household} session={session} /><RecipeLinks key={`recipe-links-${session.user.id}-${household.id}`} household={household} session={session} /></div> : !loading && !error && <section className="form-card"><h2>Wybierz swoją kuchnię</h2><p>Utwórz gospodarstwo albo zacznij od osobnego demo.</p><Link className="button" href="/household">Ustaw gospodarstwo</Link></section>}
       <DemoCreate key={`demo-${session.user.id}`} session={session} />
     </>}
   </>;

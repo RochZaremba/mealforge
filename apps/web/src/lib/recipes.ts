@@ -22,6 +22,16 @@ export type OriginalOrigin = {
   license_scope: string;
   attribution: string;
 };
+export type ImportOrigin = {
+  source_sha256: string;
+  parser_version: string;
+  actor_user_id: string;
+  imported_at: string;
+  ingredients: string[];
+  instructions: { text: string; section_path: string[] }[];
+  recipe_yield_raw: string[];
+  ignored_source_fields: string[];
+};
 export type Recipe = RecipeSummary & {
   version_id: string;
   instructions: string[];
@@ -38,7 +48,7 @@ export type Recipe = RecipeSummary & {
   storage_validation_ref: null;
   prices: null;
   provenance: {
-    source_mode: "user_authored";
+    source_mode: "user_authored" | "user_supplied_jsonld";
     source_id: "private_user_content" | "original_fixture";
     author: string;
     rights_mode: "private_user_content";
@@ -48,6 +58,7 @@ export type Recipe = RecipeSummary & {
     rights_attestation: "i_am_author" | null;
     source_version_id: string | null;
     original_origin: OriginalOrigin | null;
+    import_origin: ImportOrigin | null;
   };
 };
 export type RecipePage = { recipes: RecipeSummary[]; next_cursor: string | null };
