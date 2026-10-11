@@ -2,13 +2,14 @@
 
 - **Owner(s):** integrations + nutrition + backend + reviewer
 - **Dependencies:** WAVE-01
-- **Status:** IN PROGRESS — A link-only PR5 mergeddb2d5ab after exact4c81b0b CI PASS. B1 own JSON-LD transient preview implemented, final gates in progress. Import persistence/nutrition/providers remain incomplete
+- **Status:** IN PROGRESS — A link-only PR5 mergeddb2d5ab; B1 own JSON-LD transient preview PR6 merged539ab2c after exacta4bf645 CI PASS. B2 import persistence/nutrition/providers remain incomplete
 
 ## Implementation checklist
 
 - [ ] Canonical recipes/versions/sources, tag/storability/allegens models.
 - [x] Implement link-only save for Mealime / Ani Gotuje / Kwestia Smaku without network fetch; exact canonical domain classification from registry (W02-A PR5 merged; gates PASS).
 - [ ] Implement local JSON-LD parser on user supplied data incl @graph, recipeYield, Instructions, units; importer draft with quality status.
+  B1 bounded own-author inline preview and literal yield/sections complete; persistent draft and unit normalization remain B2/later, so this full item is not checked.
 - [ ] Create permissioned API adapter for TheMealDB behind source registry flag + credentials and a nutrient data provider abstraction for USDA/OFF (no unrestricted frontend calls).
 - [ ] Build conversions/normalization/alias dictionary for Polish ingredients, traceable nutrient math with unknown-as-null.
 - [ ] Implement product barcode search only when OFF terms accepted/configured, protect APIs and avoid license mixing.

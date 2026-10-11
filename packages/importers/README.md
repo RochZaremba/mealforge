@@ -7,5 +7,7 @@ W02-A bookmark shape validation is packaged in the modular API as
 It preserves a validated opening URL and a fragment-free canonical identity,
 and classifies exact registry hosts without DNS, HTTP, permissions or license
 inference. It is not a transport SSRF gate: future fetching requires independent
-rights, DNS/address and redirect validation. JSON-LD parsing and network adapters
-remain later slices.
+rights, DNS/address and redirect validation. Persisted JSON-LD import drafts,
+unit normalization and permissioned network adapters remain later slices.
+
+W02-B1 adds the pure bounded own JSON-LD preview in `apps/api/src/mealforge/importers/jsonld.py`; the authenticated transient endpoint lives in `preview.py`. No JSON-LD expansion, context/reference retrieval, HTML parsing, scripts, images or nutrient inference. No source/recipe persistence in B1; B2 must preserve immutable import origin explicitly before enabling save.
