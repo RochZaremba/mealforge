@@ -242,6 +242,13 @@ def test_dedup_replay_original_version_after_edit_and_lineage_remain_immutable(
     assert current["provenance"]["import_origin"] == initial["provenance"]["import_origin"]
     before = write_counts(migrated_engine)
     assert save(owner, hid, raw, key) == initial
+    changed_request = owner.post(
+        route(hid),
+        json=body(document(name="Different request with same key")),
+        headers=headers(owner, key),
+    )
+    assert changed_request.status_code == 409
+    assert changed_request.json()["error_code"] == "IDEMPOTENCY_CONFLICT"
     duplicate = owner.post(route(hid), json=body(raw), headers=headers(owner))
     assert duplicate.status_code == 409
     assert duplicate.json()["error_code"] == "JSONLD_ALREADY_IMPORTED"
@@ -322,6 +329,8 @@ def test_current_role_revocation_idor_csrf_and_idempotency_auth(clients, migrate
         {"planner_eligible": True},
         {"storage_method": "shelf_stable"},
         {"rights_attestation": "licensed"},
+        {"rights_attestation": None},
+        {"document": True},
     ],
 )
 def test_protected_client_fields_cannot_be_saved(clients, migrated_engine, extra):
@@ -360,6 +369,12 @@ def test_catalogue_limit_and_complete_utf8_snapshot_budget_are_atomic(clients, m
     malformed = owner.post(route(hid), json=body('{"x":NaN}'), headers=headers(owner))
     assert malformed.status_code == 422
     assert malformed.json()["error_code"] == "JSONLD_INVALID"
+    too_many_bytes = owner.post(
+        route(hid),
+        content=json.dumps(body("x" * 17000)),
+        headers={**headers(owner), "Content-Type": "application/json"},
+    )
+    assert too_many_bytes.status_code == 413
     assert write_counts(migrated_engine) == before
 
 
