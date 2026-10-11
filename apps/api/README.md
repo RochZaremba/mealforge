@@ -102,3 +102,5 @@ and excluded from planning. User notes do not become structured nutrition/safety
 claims. The complete source registry ships in the installed package with bounded
 integrity-checked loading; absence or drift aborts creation. There is no edit,
 delete, remote preview, parser or automatic import in this slice.
+
+W02-B1: authenticated editor/owner POST `/api/v1/households/{id}/recipe-imports/preview` parses a bounded own JSON-LD string after explicit authorship/CSRF/origin/current-household checks. Returns a private transient preview with literal ingredients/steps/yield and unknown nutrition/allergens. No network or writes; imported-recipe persistence is B2. See ADR0018 and generated OpenAPI for supported inline subset/budgets/errors. PR6 merged after300API/30E2E and independent review/CI.

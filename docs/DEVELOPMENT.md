@@ -73,6 +73,6 @@ On /recipes, select a household and use “Dodaj link”. Supply an HTTPS addres
 
 Saving a URL does not create a recipe, determine nutrition/allergens/storage or grant import rights. Known source IDs merely classify exact domains. The opening URL keeps its fragment; deduplication ignores it. Source-registry check dates come from the packaged configuration, not a new Terms audit. `make source-registry-test` compares repository/installed registry with the audited loader in the actual Docker API; tampered resources fail closed. Full W02 parser, nutrition calculation and provider adapters remain future slices.
 
-## Own JSON-LD preview W02-B1 (local gates passed; final documented-head CI pending)
+## Own JSON-LD preview W02-B1 (PR6 merged; gates passed)
 
 On /recipes, editor/owner opens “Podgląd własnego JSON-LD”, pastes one own recipe JSON with a title, text ingredient list and inline instructions, confirms authorship of the whole supplied recipe, then requests a real server preview. Raw HTML, multiple recipes, reference-only instructions, nonfinite numbers or over-budget input fail safely. This is a transient preview, not a save. Literal text remains escaped; images, links and contexts are not fetched. Quantity/unit/state, nutrition/allergens, yield mass/servings and storage remain unverified. Document stays in scoped memory and clears when that form/household/auth context unmounts. Persisted import origin and recipe creation follow in B2; no hidden write or new database schema.
