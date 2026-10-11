@@ -6,7 +6,7 @@
 |---|---|---|
 | WAVE-00 | COMPLETE (tests run; CI PASS; merged) | PR #1 merged62fe10c; Actions38066767207+38066764096 PASS head185425a;16API/4PG,10E2E mobile+desktop,realCompose,backup restore; independent reviewer/security gate PASS; docs/TEST_REPORT.md |
 | WAVE-01 | COMPLETE (tests run; CI PASS; merged) | A PR2 d544a88; B PR3 7b1df55; C PR4 mergedc3f58ee:120API/24mobile+desktopE2E PASS, Docker fixture and14-table1464-row restore/privacy PASS; independent localreviewc880c5b accepted; exact13c1c83 Actions38091280517/38091277922 SUCCESS includingcleanup |
-| WAVE-02 | IN PROGRESS (A and B1 COMPLETE; B2 IN PROGRESS) | PR5 mergeddb2d5ab; PR6 merged539ab2c:300API/30E2E+2final cases, Docker/migrations/assets/15-table2961-row restore/privacy and independentLOCAL review3a2b387 PASS. Exacta4bf645 Actions38129924542/38129922538 SUCCESS includingcleanup. Import persistence/nutrition/providers remain next slices |
+| WAVE-02 | IN PROGRESS (A and B1 COMPLETE; B2 LOCAL PASS; final CI/merge pending) | PR5 mergeddb2d5ab; PR6 merged539ab2c:300API/30E2E+2final cases, Docker/migrations/assets/15-table2961-row restore/privacy and independentLOCAL review3a2b387 PASS. Exacta4bf645 Actions38129924542/38129922538 SUCCESS includingcleanup. Import persistence/nutrition/providers remain next slices |
 | WAVE-03 | NOT STARTED | brak planera |
 | WAVE-04 | NOT STARTED | brak kitchen/inventory/shopping |
 | WAVE-05 | NOT STARTED | brak solvera |
@@ -16,3 +16,5 @@
 Agent główny wypełnia statusy `IN PROGRESS`, `COMPLETE (tests run)` lub `BLOCKED` wraz z konkretnymi commitami/komendami.
 
 W02-B2 rozpoczęte na feat/wave-02-jsonld-save: plan4646eca/ADR0019, zapis prywatnego szkicu z immutable import_origin. Gate testów/review/CI pozostaje otwarty; brak deklaracji ukończenia.
+
+W02-B2 LOCAL PASS na source ce43650: jawny zapis własnego JSON-LD, immutable origin, dedup/replay, katalog/edycja/historia. 323 pełne API +15 ukierunkowanych QA (dwa nowe przypadki po collection), 34 E2E390/1440, migracje, build/types/lint/kontrakty/158kit, Docker0006, restore15tabel/3719rekordów oraz niezależne review PASS. Wyścig starego GET:2FAIL przed poprawką,34PASS po poprawce. Końcowe CI dokumentowanego commita i merge pozostają otwarte; nie deklarujemy pełnych325 lokalnie ani ukończenia całego W02.

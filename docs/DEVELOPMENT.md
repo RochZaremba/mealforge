@@ -78,7 +78,7 @@ Saving a URL does not create a recipe, determine nutrition/allergens/storage or 
 On /recipes, editor/owner opens “Podgląd własnego JSON-LD”, pastes one own recipe JSON with a title, text ingredient list and inline instructions, confirms authorship of the whole supplied recipe, then requests a real server preview. Raw HTML, multiple recipes, reference-only instructions, nonfinite numbers or over-budget input fail safely. This is a transient preview, not a save. Literal text remains escaped; images, links and contexts are not fetched. Quantity/unit/state, nutrition/allergens, yield mass/servings and storage remain unverified. Document stays in scoped memory and clears when that form/household/auth context unmounts. B1 creates no hidden write or new database schema. The separate B2 save described below adds explicit recipe creation and an origin deduplication index.
 
 
-## Own JSON-LD save W02-B2 (acceptance in progress)
+## Own JSON-LD save W02-B2 (local acceptance PASS; final CI before merge)
 
 After a successful preview on /recipes, use “Zapisz szkic przepisu” to explicitly save the same own-author document. The server reparses it and opens its confirmed private draft in the catalogue. Unknown quantity/units/state, nutrients/allergens, measured yield/servings and storage remain unknown. Save rejects ingredient literals over160 and complete snapshots over32KiB without truncation; the form keeps your document on error. A repeated exact document in the same household is a duplicate, not a new version.
 

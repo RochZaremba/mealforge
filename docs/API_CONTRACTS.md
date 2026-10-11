@@ -156,7 +156,7 @@ POST `/households/{id}/recipe-imports/preview`: editor/owner, session, trusted O
 
 200 response: title, literal ingredient texts with `amount:null/unit:unknown/weight_state:unknown`, instruction texts and section paths, unverified `recipe_yield_raw` strings, source SHA256/parser_version, fixed ignored-field names, `source_mode:user_supplied_jsonld`, `rights_mode:private_user_content`, license null, nutrition/allergens unknown, draft status, planner false and `persisted:false`. Field names from JSON-LD do not grant rights, resolve references, convert units or verify nutrition/storage. Missing/malformed/ambiguous/unsupported content returns sanitized422 `JSONLD_INVALID`; unknown input fields/author attestation422, viewer403, foreign/revoked404; no-store on all responses. Preview is not the future persisted recipe-import contract in contracts/recipe-import.schema.json; B2 will extend provenance explicitly.
 
-## W02-B2 own JSON-LD save (implementation in progress)
+## W02-B2 own JSON-LD save (local acceptance PASS; final CI before merge)
 
 POST `/api/v1/households/{id}/recipe-imports` accepts the strict B1 input `{document, rights_attestation: "i_am_author"}` and requires current editor/owner, Origin/CSRF and UUID Idempotency-Key. Server reparses the exact document; 201 returns RecipeDetail, a private unverified draft. Same key returns the immutable original version after reauthorization; a different key for an already imported exact UTF8 source hash in the same household returns409 JSONLD_ALREADY_IMPORTED. No fetching, permissioned third-party import, nutrient calculation or planner activation.
 

@@ -101,7 +101,7 @@ Unique `(household_id, canonical_url)` and a shared household transaction lock p
 
 Creation, metadata-only audit and reference-only idempotency result commit atomically. Raw URLs/notes are absent from audit/idempotency JSON. Current membership is reauthorized before replay. The packaged registry is bounded, digest-audited and compared against repository configuration in CI and the running Docker API; classification never activates any adapter. Source information is frozen at creation, preserving its configured check date rather than claiming a new Terms review.
 
-## W02-B2 private JSON-LD origin (implementation in progress)
+## W02-B2 private JSON-LD origin (local acceptance PASS; final CI before merge)
 
 ADR0019 extends the existing immutable version snapshot with optional server-owned provenance.import_origin, default null when loading old snapshots. Origin preserves the exact input hash and parser, importing account/time, literal ingredients and sectioned steps, unverified yield and fixed ignored field names. It does not persist a raw document or remote/rights/nutrition declarations. Manual revisions retain the same original evidence and add source-version lineage; existing immutable version triggers remain authoritative.
 
