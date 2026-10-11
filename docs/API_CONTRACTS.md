@@ -150,7 +150,7 @@ Summary: `id`, `household_id`, `user_title`, `source_url`, `host`, nullable `sou
 
 Opening URL preserves fragments, query order and encoded separators. Canonical URL removes only the fragment for deduplication after safe scheme/host/default-port normalization. Unsafe numeric/local hosts, credentials, non-443 ports, raw whitespace/control/backslashes, encoded controls, malformed percent encoding, domain-changing IDNA mappings and browser dot segments are rejected. Validation performs neither DNS nor HTTP; a syntactically allowed domain is not evidence of public resolution or permission for future fetching. No edit/delete/import endpoints exist in A. Missing or changed packaged registry aborts creation atomically with 503 `SOURCE_REGISTRY_UNAVAILABLE`.
 
-## W02-B1 own JSON-LD preview (final acceptance in progress)
+## W02-B1 own JSON-LD preview (local gates passed; final documented-head CI pending)
 
 POST `/households/{id}/recipe-imports/preview`: editor/owner, session, trusted Origin, JSON and CSRF; strict `{document: string, rights_attestation: "i_am_author"}`. Document<=12288UTF8bytes; outer body<=16KiB. This is a transient read computation: no idempotency requirement/record, audit write, recipe creation or persisted source. No other import route is implemented.
 
