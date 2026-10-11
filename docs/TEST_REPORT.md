@@ -177,3 +177,10 @@ W02-B1 gate CLOSED: exacta4bf645cb0c216d23feb5e34bde9eee5c4b7a16f Actions3812992
 - Bootstrap `python3 scripts/validate_kit.py`: exit0,154 checks PASS but one skipped fixture/schema check because system Python lacks jsonschema; not accepted as complete kit gate.
 - Bootstrap `make validate-kit` with the locked uv environment: exit0,157 checks PASS/no skips, before B2 contracts and ADR changes.
 - Execution plan4646eca, contract4d429fe, ADR0019; integrations/security read-only preflight accepted with current authorization/reparse/origin/budget/unknown constraints. Backend/frontend/QA assigned exclusive new worktrees/files. No B2 functionality or final test success claimed yet.
+
+### B2 first integrated feedback loop
+
+- Backend706073f + frontend609fe94 + QA dd6c25c/0b09ef6 integrated on lead122e608; actual OpenAPI generated. Targeted backend/QA23 PostgreSQL tests passed25.14s (including migration up/check/down5/up/check, immutable snapshots, duplicate races and origin/unknown preservation). Initial expression-index reflection drift was fixed using explicit PostgreSQL text[] cast; no check suppression.
+- QA followup65d6f2a adds changed-payload retry409 and malformed/oversize HTTP rejection:15 isolated PostgreSQL tests PASS21.71s; Ruff PASS. The ongoing full test run collected323 before these two extra cases were integrated; its final result remains pending.
+- First integrated `make lint typecheck check-contract build validate-kit`: exit0; Ruff/eslint/mypy46/TypeScript/OpenAPI/production11routes and158 kit checks/no skips PASS. `make dev`:exit0; actual API/web/PostgreSQL healthy, migration0006 installed. Final frontend guard patch/build still required.
+- Independent reviewer found P2: an older pending recipe detail GET can overwrite the newly imported201 detail. Frontend fixes request-generation invalidation; QA adds an actual delayed-response regression. This issue is OPEN until patch and browser retest; B2 acceptance is not claimed yet.
