@@ -675,6 +675,180 @@
         "title": "OriginalOrigin",
         "type": "object"
       },
+      "PreviewIngredient": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "null"
+          },
+          "literal_text": {
+            "title": "Literal Text",
+            "type": "string"
+          },
+          "unit": {
+            "const": "unknown",
+            "default": "unknown",
+            "title": "Unit",
+            "type": "string"
+          },
+          "weight_state": {
+            "const": "unknown",
+            "default": "unknown",
+            "title": "Weight State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "literal_text"
+        ],
+        "title": "PreviewIngredient",
+        "type": "object"
+      },
+      "PreviewInput": {
+        "additionalProperties": false,
+        "properties": {
+          "document": {
+            "maxLength": 12288,
+            "minLength": 1,
+            "title": "Document",
+            "type": "string"
+          },
+          "rights_attestation": {
+            "const": "i_am_author",
+            "title": "Rights Attestation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document",
+          "rights_attestation"
+        ],
+        "title": "PreviewInput",
+        "type": "object"
+      },
+      "PreviewResponse": {
+        "properties": {
+          "allergen_status": {
+            "const": "unknown",
+            "default": "unknown",
+            "title": "Allergen Status",
+            "type": "string"
+          },
+          "ignored_source_fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Ignored Source Fields",
+            "type": "array"
+          },
+          "ingredients": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewIngredient"
+            },
+            "title": "Ingredients",
+            "type": "array"
+          },
+          "instructions": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewStep"
+            },
+            "title": "Instructions",
+            "type": "array"
+          },
+          "license": {
+            "title": "License",
+            "type": "null"
+          },
+          "nutrition_status": {
+            "const": "unknown",
+            "default": "unknown",
+            "title": "Nutrition Status",
+            "type": "string"
+          },
+          "parser_version": {
+            "const": "jsonld-preview-v1",
+            "default": "jsonld-preview-v1",
+            "title": "Parser Version",
+            "type": "string"
+          },
+          "persisted": {
+            "const": false,
+            "default": false,
+            "title": "Persisted",
+            "type": "boolean"
+          },
+          "planner_eligible": {
+            "const": false,
+            "default": false,
+            "title": "Planner Eligible",
+            "type": "boolean"
+          },
+          "recipe_yield_raw": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Recipe Yield Raw",
+            "type": "array"
+          },
+          "rights_mode": {
+            "const": "private_user_content",
+            "default": "private_user_content",
+            "title": "Rights Mode",
+            "type": "string"
+          },
+          "source_mode": {
+            "const": "user_supplied_jsonld",
+            "default": "user_supplied_jsonld",
+            "title": "Source Mode",
+            "type": "string"
+          },
+          "source_sha256": {
+            "title": "Source Sha256",
+            "type": "string"
+          },
+          "status": {
+            "const": "draft_requires_review",
+            "default": "draft_requires_review",
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "ingredients",
+          "instructions",
+          "recipe_yield_raw",
+          "source_sha256",
+          "ignored_source_fields"
+        ],
+        "title": "PreviewResponse",
+        "type": "object"
+      },
+      "PreviewStep": {
+        "properties": {
+          "section_path": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Section Path",
+            "type": "array"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "section_path"
+        ],
+        "title": "PreviewStep",
+        "type": "object"
+      },
       "Provenance": {
         "properties": {
           "attribution": {
@@ -10993,6 +11167,489 @@
         "summary": "Target History",
         "tags": [
           "households"
+        ]
+      }
+    },
+    "/api/v1/households/{household_id}/recipe-imports/preview": {
+      "post": {
+        "operationId": "preview_api_v1_households__household_id__recipe_imports_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "household_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Household Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "error_code": {
+                      "title": "Error Code",
+                      "type": "string"
+                    },
+                    "field_errors": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Field Errors"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "title": "Request Id",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error_code",
+                    "message",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Żądanie odrzucone lub usługa niedostępna."
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "error_code": {
+                      "title": "Error Code",
+                      "type": "string"
+                    },
+                    "field_errors": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Field Errors"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "title": "Request Id",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error_code",
+                    "message",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Żądanie odrzucone lub usługa niedostępna."
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "error_code": {
+                      "title": "Error Code",
+                      "type": "string"
+                    },
+                    "field_errors": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Field Errors"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "title": "Request Id",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error_code",
+                    "message",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Żądanie odrzucone lub usługa niedostępna."
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "error_code": {
+                      "title": "Error Code",
+                      "type": "string"
+                    },
+                    "field_errors": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Field Errors"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "title": "Request Id",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error_code",
+                    "message",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Żądanie odrzucone lub usługa niedostępna."
+          },
+          "410": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "error_code": {
+                      "title": "Error Code",
+                      "type": "string"
+                    },
+                    "field_errors": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Field Errors"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "title": "Request Id",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error_code",
+                    "message",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Żądanie odrzucone lub usługa niedostępna."
+          },
+          "413": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "error_code": {
+                      "title": "Error Code",
+                      "type": "string"
+                    },
+                    "field_errors": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Field Errors"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "title": "Request Id",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error_code",
+                    "message",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Żądanie odrzucone lub usługa niedostępna."
+          },
+          "415": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "error_code": {
+                      "title": "Error Code",
+                      "type": "string"
+                    },
+                    "field_errors": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Field Errors"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "title": "Request Id",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error_code",
+                    "message",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Żądanie odrzucone lub usługa niedostępna."
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "error_code": {
+                      "title": "Error Code",
+                      "type": "string"
+                    },
+                    "field_errors": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Field Errors"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "title": "Request Id",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error_code",
+                    "message",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Żądanie odrzucone lub usługa niedostępna."
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "error_code": {
+                      "title": "Error Code",
+                      "type": "string"
+                    },
+                    "field_errors": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Field Errors"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "title": "Request Id",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error_code",
+                    "message",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Żądanie odrzucone lub usługa niedostępna."
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "error_code": {
+                      "title": "Error Code",
+                      "type": "string"
+                    },
+                    "field_errors": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "Field Errors"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    },
+                    "request_id": {
+                      "title": "Request Id",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error_code",
+                    "message",
+                    "request_id"
+                  ],
+                  "title": "Problem",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Żądanie odrzucone lub usługa niedostępna."
+          }
+        },
+        "summary": "Preview",
+        "tags": [
+          "recipe-imports"
         ]
       }
     },

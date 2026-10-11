@@ -6,6 +6,7 @@ import { stateLabels, unitLabels, type Ingredient, type Recipe, type RecipeHisto
 import { HouseholdSelector, useHousehold } from "./household-provider";
 import { useSession } from "./session-provider";
 import { RecipeLinks } from "./recipe-links";
+import { JsonldPreview } from "./jsonld-preview";
 
 function useMounted() {
   const mounted = useRef(false);
@@ -267,7 +268,7 @@ export function RecipesScreen() {
       <HouseholdSelector />
       {loading && <p role="status">Sprawdzanie gospodarstwa…</p>}
       {error && <section className="form-card"><Feedback error={error} /><button className="secondary-button" type="button" onClick={() => void refreshHouseholds().catch(() => {})}>Sprawdź gospodarstwa ponownie</button></section>}
-      {household ? <div hidden={loading || !!error} inert={loading || !!error}><PrivateCatalog key={`catalog-${session.user.id}-${household.id}`} household={household} session={session} /><RecipeLinks key={`recipe-links-${session.user.id}-${household.id}`} household={household} session={session} /></div> : !loading && !error && <section className="form-card"><h2>Wybierz swoją kuchnię</h2><p>Utwórz gospodarstwo albo zacznij od osobnego demo.</p><Link className="button" href="/household">Ustaw gospodarstwo</Link></section>}
+      {household ? <div hidden={loading || !!error} inert={loading || !!error}><PrivateCatalog key={`catalog-${session.user.id}-${household.id}`} household={household} session={session} /><RecipeLinks key={`recipe-links-${session.user.id}-${household.id}`} household={household} session={session} /><JsonldPreview key={`jsonld-${session.user.id}-${household.id}`} household={household} session={session} /></div> : !loading && !error && <section className="form-card"><h2>Wybierz swoją kuchnię</h2><p>Utwórz gospodarstwo albo zacznij od osobnego demo.</p><Link className="button" href="/household">Ustaw gospodarstwo</Link></section>}
       <DemoCreate key={`demo-${session.user.id}`} session={session} />
     </>}
   </>;
