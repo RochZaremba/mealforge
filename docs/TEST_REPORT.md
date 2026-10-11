@@ -171,3 +171,9 @@ W02-A gate CLOSED: PR5 mergeddb2d5abaccaf46f3da4fe4ac7d025a491fe174e3 after exac
 W02-B1 LOCAL gate PASS: independent reviewer personally read final logs and viewed both synthetic screenshots; source3a2b387/docsbaseline45a724a, no openP0–P2 in transient own-author preview scope. Earlier pending fields above are historical; all local gates are now complete. Intermediate exact45a724a241a98fab5aa1e3d53019a903117948bc Actions38129607272/38129577726 SUCCESS includingcleanup; final documented-head CI still required beforemerge.
 
 W02-B1 gate CLOSED: exacta4bf645cb0c216d23feb5e34bde9eee5c4b7a16f Actions38129924542/38129922538 SUCCESS includingcleanup. PR6 merged539ab2ce0ef91809cc02490364ad824263cc7e4b at2026-10-11T09:56:53Z. No admin/bypass or production deployment. B1 COMPLETE within author-only transient preview scope; wholeW02, B2persistence/nutrition/providers and later domainflow remain incomplete.
+
+## W02-B2 — acceptance in progress
+
+- Bootstrap `python3 scripts/validate_kit.py`: exit0,154 checks PASS but one skipped fixture/schema check because system Python lacks jsonschema; not accepted as complete kit gate.
+- Bootstrap `make validate-kit` with the locked uv environment: exit0,157 checks PASS/no skips, before B2 contracts and ADR changes.
+- Execution plan4646eca, contract4d429fe, ADR0019; integrations/security read-only preflight accepted with current authorization/reparse/origin/budget/unknown constraints. Backend/frontend/QA assigned exclusive new worktrees/files. No B2 functionality or final test success claimed yet.
